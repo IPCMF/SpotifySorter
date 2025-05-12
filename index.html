@@ -17,28 +17,33 @@
             --icon-button-hover: rgba(100, 100, 100, 0.9);
         }
 
+        html, body {
+             height: 100%; /* Ensure body takes full height */
+             margin: 0;
+             padding: 0;
+             overflow: hidden; /* Prevent body scrollbars */
+        }
+
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background-color: var(--secondary-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+            min-height: 100vh; /* Use min-height for flexibility */
         }
 
         #app-container {
             display: flex;
             width: 95%;
             max-width: 1200px;
-            min-height: 80vh;
-            background-color: rgba(40, 40, 40, 0.8); /* Darker transparent background */
+            height: 90vh; /* Set a fixed viewport height percentage */
+            max-height: 800px; /* Optional: Max height in pixels */
+            background-color: rgba(40, 40, 40, 0.8);
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            overflow: hidden; /* Contain children */
+            overflow: hidden; /* Crucial: contain children */
         }
 
         /* --- Login --- */
@@ -47,7 +52,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            width: 100%; /* Takes full width initially */
+            width: 100%;
+            height: 100%; /* Fill container */
             padding: 40px;
             text-align: center;
         }
@@ -63,51 +69,53 @@
             cursor: pointer;
             transition: background-color 0.2s ease;
         }
-
-        #login-button:hover {
-            background-color: var(--button-hover);
-        }
+        #login-button:hover { background-color: var(--button-hover); }
 
         /* --- Main App --- */
         #main-app {
             display: none; /* Hidden by default */
             flex-direction: row;
             width: 100%;
+            height: 100%; /* Fill container */
         }
 
         /* --- Sidebar (Keep List) --- */
         #sidebar {
-            width: 280px; /* Slightly wider for buttons */
-            flex-shrink: 0; /* Prevent shrinking */
-            background-color: rgba(25, 20, 20, 0.7); /* Slightly darker sidebar */
+            width: 280px;
+            flex-shrink: 0;
+            background-color: rgba(25, 20, 20, 0.7);
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto; /* Scroll if list is long */
+            display: flex; /* Use flexbox for layout */
+            flex-direction: column; /* Stack children vertically */
+            overflow: hidden; /* Hide overflow initially, children will handle scroll */
             border-right: 1px solid rgba(100, 100, 100, 0.5);
+            height: 100%; /* Take full height of parent (#main-app) */
+            box-sizing: border-box; /* Include padding in height calculation */
         }
 
         #sidebar h3 {
             margin-top: 0;
+            margin-bottom: 10px; /* Space below header */
             color: var(--primary-color);
             border-bottom: 1px solid var(--light-gray);
             padding-bottom: 10px;
+            flex-shrink: 0; /* Prevent header shrinking */
         }
 
         #kept-songs-list {
             list-style: none;
             padding: 0;
-            margin: 10px 0;
-            flex-grow: 1; /* Takes available space */
+            margin: 0; /* Remove default margins */
+            flex-grow: 1; /* Allow list to take available vertical space */
+            overflow-y: auto; /* <<< ADD SCROLLING HERE */
+            overflow-x: hidden; /* Hide horizontal scrollbar */
+            /* border: 1px solid red; /* Debugging border */
         }
 
         #kept-songs-list li {
             font-size: 0.9em;
-            padding: 8px 5px; /* More padding */
+            padding: 8px 5px;
             border-bottom: 1px solid rgba(80, 80, 80, 0.5);
-            /* display: flex; /* Use flex on inner container instead */
-            /* justify-content: space-between; */
-            /* align-items: center; */
             gap: 5px;
         }
 
@@ -116,75 +124,41 @@
              justify-content: space-between;
              align-items: center;
              width: 100%;
-             gap: 8px; /* Space between text and buttons */
+             gap: 8px;
         }
-
         .kept-song-text {
-            flex-grow: 1; /* Allow text to take available space */
-            overflow: hidden; /* Prevent text overflow */
+            flex-grow: 1;
+            overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
         }
-
         .kept-song-text span {
             font-size: 0.8em;
             color: var(--light-gray);
             display: block;
-             white-space: nowrap;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
-        .kept-song-buttons {
-             display: flex;
-             gap: 5px;
-             flex-shrink: 0; /* Prevent buttons shrinking */
-        }
-
+        .kept-song-buttons { display: flex; gap: 5px; flex-shrink: 0; }
         .kept-list-btn {
-            background: var(--icon-button-bg);
-            border: none;
-            color: var(--text-color);
-            border-radius: 4px;
-            padding: 4px 6px;
-            cursor: pointer;
-            font-size: 0.9em;
-            line-height: 1;
-            transition: background-color 0.2s ease;
+            background: var(--icon-button-bg); border: none; color: var(--text-color);
+            border-radius: 4px; padding: 4px 6px; cursor: pointer; font-size: 0.9em;
+            line-height: 1; transition: background-color 0.2s ease;
         }
-        .kept-list-btn:hover {
-            background: var(--icon-button-hover);
-        }
-        .kept-list-btn.kept-remove-btn:hover {
-            background: var(--delete-color);
-        }
-         .kept-list-btn:disabled {
-             opacity: 0.5;
-             cursor: not-allowed;
-         }
-
+        .kept-list-btn:hover { background: var(--icon-button-hover); }
+        .kept-list-btn.kept-remove-btn:hover { background: var(--delete-color); }
+        .kept-list-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         #make-playlist-button {
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            border: none;
-            padding: 12px 20px;
-            border-radius: 50px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-top: auto; /* Pushes button to bottom */
+            background-color: var(--primary-color); color: var(--text-color); border: none;
+            padding: 12px 20px; border-radius: 50px; font-size: 1em; font-weight: bold;
+            cursor: pointer; transition: background-color 0.2s ease;
+            margin-top: 15px; /* Space above button */
+            flex-shrink: 0; /* Prevent button shrinking */
         }
-
-        #make-playlist-button:hover {
-            background-color: var(--button-hover);
-        }
-        #make-playlist-button:disabled {
-            background-color: var(--light-gray);
-            cursor: not-allowed;
-        }
-
+        #make-playlist-button:hover { background-color: var(--button-hover); }
+        #make-playlist-button:disabled { background-color: var(--light-gray); cursor: not-allowed; }
 
         /* --- Main Content Area --- */
         #content-area {
@@ -193,155 +167,61 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            position: relative; /* For button positioning if needed */
-             overflow: hidden; /* Prevent content overflow issues */
+            position: relative;
+            overflow: hidden; /* Prevent its own scrollbars unless necessary */
+            height: 100%; /* Fill container */
+            box-sizing: border-box; /* Include padding in height calculation */
         }
 
         /* Playlist Selection & Progress */
-        #playlist-selector-container {
-            width: 100%;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        #playlist-selector {
-            padding: 10px 15px;
-            border-radius: 5px;
-            border: 1px solid var(--light-gray);
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-            font-size: 1em;
-            max-width: 400px; /* Limit width */
-        }
-         #playlist-selector:disabled {
-            opacity: 0.6;
-         }
-
-        #sorting-info {
-            width: 100%;
-            text-align: center;
-            margin-bottom: 25px;
-            color: var(--light-gray);
-            font-size: 0.9em;
-        }
-        #sorting-info strong {
-            color: var(--text-color);
-        }
-        #progress-percentage {
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-left: 10px;
-        }
+        #playlist-selector-container { width: 100%; margin-bottom: 20px; text-align: center; flex-shrink: 0;}
+        #playlist-selector { padding: 10px 15px; border-radius: 5px; border: 1px solid var(--light-gray); background-color: var(--secondary-color); color: var(--text-color); font-size: 1em; max-width: 400px; }
+        #playlist-selector:disabled { opacity: 0.6; }
+        #sorting-info { width: 100%; text-align: center; margin-bottom: 25px; color: var(--light-gray); font-size: 0.9em; flex-shrink: 0;}
+        #sorting-info strong { color: var(--text-color); }
+        #progress-percentage { font-weight: bold; color: var(--primary-color); margin-left: 10px; }
 
         /* Track Display */
         #track-display {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            margin-bottom: 30px; /* Space before buttons */
-            min-height: 380px; /* Reserve space to prevent layout jumps */
-            width: 100%; /* Ensure it takes width */
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            margin-bottom: 30px; /* Space before controls */
+            flex-shrink: 0; /* Prevent shrinking when content area is small */
+             /* Removed min-height, rely on flexbox centering */
+             width: 100%;
         }
-
-        #track-cover {
-            width: 250px;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            background-color: #333; /* Placeholder color */
-        }
-
-        #track-title {
-            font-size: 1.4em;
-            font-weight: bold;
-            margin-bottom: 5px;
-            max-width: 90%;
-        }
-
-        #track-artist {
-            font-size: 1em;
-            color: var(--light-gray);
-            max-width: 90%;
-        }
-
-        #no-preview-message {
-            color: var(--light-gray);
-            font-style: italic;
-            margin-top: 10px;
-        }
-
+        #track-cover { width: 250px; height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); background-color: #333; }
+        #track-title { font-size: 1.4em; font-weight: bold; margin-bottom: 5px; max-width: 90%; }
+        #track-artist { font-size: 1em; color: var(--light-gray); max-width: 90%; }
+        #no-preview-message { color: var(--light-gray); font-style: italic; margin-top: 10px; }
 
         /* Control Buttons */
         #controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
             width: 100%;
-            margin-top: auto; /* Push controls towards bottom */
+            margin-top: auto; /* Push controls towards bottom of content area */
+            padding-bottom: 20px; /* Add some padding at the bottom */
+             flex-shrink: 0;
         }
-
         .control-button {
-            background-color: rgba(80, 80, 80, 0.7);
-            color: var(--text-color);
-            border: none;
-            border-radius: 50%; /* Circular */
-            width: 60px;
-            height: 60px;
-            font-size: 1.8em; /* Adjust arrow size */
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 25px; /* Space between buttons */
+            background-color: rgba(80, 80, 80, 0.7); color: var(--text-color); border: none;
+            border-radius: 50%; width: 60px; height: 60px; font-size: 1.8em; font-weight: bold;
+            cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease;
+            display: flex; justify-content: center; align-items: center; margin: 0 25px;
         }
-        .control-button:hover {
-            background-color: rgba(100, 100, 100, 0.9);
-        }
-        .control-button:active {
-            transform: scale(0.95);
-        }
-        .control-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-
-        #delete-button {
-            background-color: var(--delete-color);
-            width: 70px; /* Slightly larger */
-            height: 70px;
-            font-size: 1em; /* Text instead of icon */
-            line-height: 1; /* Adjust for text centering */
-            order: 0; /* Center button in flex layout */
-            margin: 0 15px;
-        }
-        #delete-button:hover {
-            background-color: var(--delete-hover);
-        }
-
-        #ignore-button { order: -1; /* Put on the left */ }
-        #keep-button   { order: 1;  /* Put on the right */ }
+        .control-button:hover { background-color: rgba(100, 100, 100, 0.9); }
+        .control-button:active { transform: scale(0.95); }
+        .control-button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #delete-button { background-color: var(--delete-color); width: 70px; height: 70px; font-size: 1em; line-height: 1; order: 0; margin: 0 15px; }
+        #delete-button:hover { background-color: var(--delete-hover); }
+        #ignore-button { order: -1; }
+        #keep-button   { order: 1;  }
 
         /* Loading / Message Overlay */
         #loading-overlay {
-            position: fixed; /* Use fixed to cover viewport */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.75); /* Slightly darker overlay */
-            color: white;
-            display: none; /* Hidden by default */
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5em;
-            z-index: 1000; /* Ensure overlay is on top */
-            text-align: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.75); color: white;
+            display: none; justify-content: center; align-items: center;
+            font-size: 1.5em; z-index: 1000; text-align: center;
         }
          /* Utility Classes */
         .hidden { display: none !important; }
@@ -392,9 +272,9 @@
                 </div>
 
                 <div id="controls">
-                    <button id="ignore-button" class="control-button" title="Ignore (Left Arrow)" disabled>&#x2190;</button> <!-- Left Arrow -->
+                    <button id="ignore-button" class="control-button" title="Ignore (Left Arrow)" disabled>&#x2190;</button>
                     <button id="delete-button" class="control-button" title="Delete from Original (Backspace)" disabled>Delete</button>
-                    <button id="keep-button" class="control-button" title="Keep (Right Arrow)" disabled>&#x2192;</button> <!-- Right Arrow -->
+                    <button id="keep-button" class="control-button" title="Keep (Right Arrow)" disabled>&#x2192;</button>
                 </div>
 
                  <!-- Hidden Audio Player -->
@@ -404,15 +284,12 @@
 
         </main>
          <!-- Loading/Processing Overlay -->
-         <!-- Moved outside main-app to ensure it covers everything -->
-         <div id="loading-overlay">
-            Processing...
-        </div>
+         <div id="loading-overlay"> Processing... </div>
     </div>
 
     <script>
         // --- Configuration ---
-        const CLIENT_ID = "b216d27a627045e4a18b9276628b62f2"; // <--- REPLACE THIS
+        const CLIENT_ID = "e6e4760b436f4a879b8fa478084e4c75"; // <--- Your Client ID
         const REDIRECT_URI = window.location.origin + window.location.pathname;
         const SCOPES = [
             "user-read-private", "playlist-read-private", "playlist-read-collaborative",
@@ -423,15 +300,9 @@
         const SPOTIFY_API_BASE_URL = "https://api.spotify.com/v1";
 
         // --- State Variables ---
-        let accessToken = null;
-        let codeVerifier = null;
-        let userId = null;
-        let playlists = [];
-        let selectedPlaylistId = null;
-        let currentPlaylistName = "";
-        let tracks = [];
-        let currentTrackIndex = -1;
-        let keptTracks = []; // Array of { track: {...}, uri: '...' }
+        let accessToken = null; let codeVerifier = null; let userId = null;
+        let playlists = []; let selectedPlaylistId = null; let currentPlaylistName = "";
+        let tracks = []; let currentTrackIndex = -1; let keptTracks = [];
 
         // --- UI Elements ---
         const loginSection = document.getElementById('login-section');
@@ -455,253 +326,129 @@
         const loadingOverlay = document.getElementById('loading-overlay');
 
         // --- PKCE Helper Functions ---
-        function generateRandomString(length) { /* ... (same as before) ... */
+        function generateRandomString(length) {
             const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let text = '';
-            for (let i = 0; i < length; i++) {
-                text += possible.charAt(Math.floor(Math.random() * possible.length));
-            }
+            for (let i = 0; i < length; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)); }
             return text;
          }
-        async function generateCodeChallenge(codeVerifier) { /* ... (same as before) ... */
-             const encoder = new TextEncoder();
-            const data = encoder.encode(codeVerifier);
-            const digest = await window.crypto.subtle.digest('SHA-256', data);
-            return btoa(String.fromCharCode(...new Uint8Array(digest)))
-                .replace(/\+/g, '-')
-                .replace(/\//g, '_')
-                .replace(/=+$/, '');
+        async function generateCodeChallenge(codeVerifier) {
+             const encoder = new TextEncoder(); const data = encoder.encode(codeVerifier);
+             const digest = await window.crypto.subtle.digest('SHA-256', data);
+             return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
         }
 
         // --- Spotify API Call Helper ---
-        async function spotifyApiCall(endpoint, method = 'GET', body = null, retries = 1) { /* ... (same as before, including 401 check) ... */
+        async function spotifyApiCall(endpoint, method = 'GET', body = null, retries = 1) {
             const url = SPOTIFY_API_BASE_URL + endpoint;
-            const headers = {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            };
+            const headers = { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
             const config = { method: method, headers: headers };
             if (body) config.body = JSON.stringify(body);
-
             try {
                 const response = await fetch(url, config);
-                if (response.status === 401 && retries > 0) {
-                    console.warn("Access token expired or invalid. Re-authenticating.");
-                    clearAuthData();
-                    redirectToSpotifyLogin();
-                    return null;
-                }
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    console.error(`Spotify API Error (${response.status}): ${response.statusText}`, errorData);
-                    throw new Error(`Spotify API Error: ${response.status} ${response.statusText}`);
-                }
-                 if (response.status === 204 || response.headers.get('content-length') === '0') {
-                    return null;
-                }
+                if (response.status === 401 && retries > 0) { console.warn("Access token expired or invalid. Re-authenticating."); clearAuthData(); redirectToSpotifyLogin(); return null; }
+                if (!response.ok) { const errorData = await response.json().catch(() => ({})); console.error(`Spotify API Error (${response.status}): ${response.statusText}`, errorData); throw new Error(`Spotify API Error: ${response.status} ${response.statusText}`); }
+                if (response.status === 204 || response.headers.get('content-length') === '0') { return null; }
                 return await response.json();
             } catch (error) {
                  console.error(`Error making Spotify API call to ${endpoint}:`, error);
                  if (retries > 0 && !error.message.includes('401')) {
-                    console.log(`Retrying API call (${retries} retries left)...`);
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    return spotifyApiCall(endpoint, method, body, retries - 1);
-                 } else {
-                    showError(`Failed API call to ${endpoint}. Check console.`);
-                    setLoading(false);
-                    throw error;
-                 }
+                    console.log(`Retrying API call (${retries} retries left)...`); await new Promise(resolve => setTimeout(resolve, 1000)); return spotifyApiCall(endpoint, method, body, retries - 1);
+                 } else { showError(`Failed API call to ${endpoint}. Check console.`); setLoading(false); throw error; }
             }
         }
 
         // --- Authentication Flow ---
-        function redirectToSpotifyLogin() { /* ... (same as before) ... */
-             codeVerifier = generateRandomString(128);
-            sessionStorage.setItem('spotify_code_verifier', codeVerifier);
-            generateCodeChallenge(codeVerifier).then(codeChallenge => {
-                const params = new URLSearchParams({
-                    client_id: CLIENT_ID, response_type: 'code', redirect_uri: REDIRECT_URI,
-                    scope: SCOPES, code_challenge_method: 'S256', code_challenge: codeChallenge,
-                });
-                window.location.href = `${SPOTIFY_AUTHORIZE_ENDPOINT}?${params.toString()}`;
-            });
+        function redirectToSpotifyLogin() {
+             codeVerifier = generateRandomString(128); sessionStorage.setItem('spotify_code_verifier', codeVerifier);
+             generateCodeChallenge(codeVerifier).then(codeChallenge => {
+                 const params = new URLSearchParams({ client_id: CLIENT_ID, response_type: 'code', redirect_uri: REDIRECT_URI, scope: SCOPES, code_challenge_method: 'S256', code_challenge: codeChallenge });
+                 window.location.href = `${SPOTIFY_AUTHORIZE_ENDPOINT}?${params.toString()}`;
+             });
         }
-        async function fetchAccessToken(code, verifier) { /* ... (same as before) ... */
+        async function fetchAccessToken(code, verifier) {
             setLoading(true, "Authenticating...");
             try {
-                 const params = new URLSearchParams({
-                    client_id: CLIENT_ID, grant_type: 'authorization_code', code: code,
-                    redirect_uri: REDIRECT_URI, code_verifier: verifier
-                });
-                const response = await fetch(SPOTIFY_TOKEN_ENDPOINT, {
-                    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: params.toString()
-                });
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    console.error("Error fetching access token:", response.status, errorData);
-                    throw new Error(`Token exchange failed: ${response.statusText}`);
-                }
-                const data = await response.json();
-                accessToken = data.access_token;
-                sessionStorage.setItem('spotify_access_token', accessToken);
-                initializeMainApp();
-            } catch (error) {
-                console.error("Could not obtain access token:", error);
-                showError("Failed to authenticate with Spotify. Please try logging in again.");
-                clearAuthData();
-                showLogin();
-            } finally {
-                 setLoading(false);
-                 window.history.replaceState({}, document.title, REDIRECT_URI);
-                 sessionStorage.removeItem('spotify_code_verifier');
-            }
-         }
-        function handleRedirect() { /* ... (same as before) ... */
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            const error = urlParams.get('error');
-            const storedVerifier = sessionStorage.getItem('spotify_code_verifier');
-            if (error) {
-                console.error("Spotify Authorization Error:", error);
-                showError(`Login failed: ${error}. Please try again.`);
-                showLogin();
-                 window.history.replaceState({}, document.title, REDIRECT_URI);
-            } else if (code && storedVerifier) {
-                fetchAccessToken(code, storedVerifier);
-            } else if (sessionStorage.getItem('spotify_access_token')) {
-                 accessToken = sessionStorage.getItem('spotify_access_token');
-                 console.log("Found existing access token in session storage.");
+                 const params = new URLSearchParams({ client_id: CLIENT_ID, grant_type: 'authorization_code', code: code, redirect_uri: REDIRECT_URI, code_verifier: verifier });
+                 const response = await fetch(SPOTIFY_TOKEN_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() });
+                 if (!response.ok) { const errorData = await response.json().catch(() => ({})); console.error("Error fetching access token:", response.status, errorData); throw new Error(`Token exchange failed: ${response.statusText}`); }
+                 const data = await response.json(); accessToken = data.access_token; sessionStorage.setItem('spotify_access_token', accessToken);
                  initializeMainApp();
-            } else {
-                showLogin();
-            }
+            } catch (error) { console.error("Could not obtain access token:", error); showError("Failed to authenticate with Spotify. Please try logging in again."); clearAuthData(); showLogin(); }
+            finally { setLoading(false); window.history.replaceState({}, document.title, REDIRECT_URI); sessionStorage.removeItem('spotify_code_verifier'); }
+         }
+        function handleRedirect() {
+            const urlParams = new URLSearchParams(window.location.search); const code = urlParams.get('code'); const error = urlParams.get('error'); const storedVerifier = sessionStorage.getItem('spotify_code_verifier');
+            if (error) { console.error("Spotify Authorization Error:", error); showError(`Login failed: ${error}. Please try again.`); showLogin(); window.history.replaceState({}, document.title, REDIRECT_URI); }
+            else if (code && storedVerifier) { fetchAccessToken(code, storedVerifier); }
+            else if (sessionStorage.getItem('spotify_access_token')) { accessToken = sessionStorage.getItem('spotify_access_token'); console.log("Found existing access token."); initializeMainApp(); }
+            else { showLogin(); }
         }
-        function clearAuthData() { /* ... (same as before) ... */
-            accessToken = null; codeVerifier = null;
-            sessionStorage.removeItem('spotify_access_token');
-            sessionStorage.removeItem('spotify_code_verifier');
-        }
-        function logout() { /* ... (same as before) ... */
-            clearAuthData(); resetAppState(); showLogin();
-            window.location.reload();
-        }
+        function clearAuthData() { accessToken = null; codeVerifier = null; sessionStorage.removeItem('spotify_access_token'); sessionStorage.removeItem('spotify_code_verifier'); }
+        function logout() { clearAuthData(); resetAppState(); showLogin(); window.location.reload(); }
 
         // --- App Initialization and UI Updates ---
-        function showLogin() { /* ... (same as before) ... */
-            loginSection.style.display = 'flex'; mainApp.style.display = 'none'; }
-        function showMainApp() { /* ... (same as before) ... */
-            loginSection.style.display = 'none'; mainApp.style.display = 'flex'; }
+        function showLogin() { loginSection.style.display = 'flex'; mainApp.style.display = 'none'; }
+        function showMainApp() { loginSection.style.display = 'none'; mainApp.style.display = 'flex'; }
         function setLoading(isLoading, message = "Loading...") {
-             if (isLoading) {
-                 loadingOverlay.textContent = message;
-                 loadingOverlay.style.display = 'flex';
-             } else {
-                 loadingOverlay.style.display = 'none';
-             }
-             // Disable/enable interactions during loading
+             loadingOverlay.style.display = isLoading ? 'flex' : 'none';
+             if(isLoading) loadingOverlay.textContent = message;
+             const shouldDisable = isLoading || (mainApp.style.display === 'flex' && (currentTrackIndex < 0 || currentTrackIndex >= tracks.length) && tracks.length > 0); // Disable main controls also when finished
              playlistSelector.disabled = isLoading;
-             ignoreButton.disabled = isLoading || currentTrackIndex < 0 || currentTrackIndex >= tracks.length;
-             keepButton.disabled = isLoading || currentTrackIndex < 0 || currentTrackIndex >= tracks.length;
-             deleteButton.disabled = isLoading || currentTrackIndex < 0 || currentTrackIndex >= tracks.length;
+             ignoreButton.disabled = shouldDisable;
+             keepButton.disabled = shouldDisable;
+             deleteButton.disabled = shouldDisable;
              makePlaylistButton.disabled = isLoading || keptTracks.length === 0;
-             // Disable kept list buttons too
-             document.querySelectorAll('.kept-list-btn').forEach(btn => btn.disabled = isLoading);
+             document.querySelectorAll('.kept-list-btn').forEach(btn => btn.disabled = isLoading); // Disable kept list buttons too
          }
-        function showError(message) { /* ... (same as before) ... */
-            alert(`Error: ${message}`); console.error("App Error:", message); }
-        async function initializeMainApp() { /* ... (same as before) ... */
-            setLoading(true, "Fetching user data...");
-            showMainApp();
+        function showError(message) { alert(`Error: ${message}`); console.error("App Error:", message); }
+        async function initializeMainApp() {
+            setLoading(true, "Fetching user data..."); showMainApp();
              try {
-                 const userData = await spotifyApiCall('/me');
-                 if (!userData) return;
-                 userId = userData.id;
-                 console.log("User ID:", userId);
-                 await loadPlaylists();
-             } catch (error) {
-                 showError("Failed to load user data. Please try logging in again.");
-                 logout();
-             } finally {
-                 setLoading(false);
-             }
+                 const userData = await spotifyApiCall('/me'); if (!userData) return; userId = userData.id; console.log("User ID:", userId); await loadPlaylists();
+             } catch (error) { showError("Failed to load user data. Please try logging in again."); logout(); }
+             finally { setLoading(false); }
         }
-        async function loadPlaylists() { /* ... (same as before) ... */
-            setLoading(true, "Fetching playlists...");
-             playlistSelector.disabled = true;
-             playlistSelector.innerHTML = '<option value="">Loading playlists...</option>';
-             playlists = [];
-             let url = '/me/playlists?limit=50';
-             let hasMore = true;
+        async function loadPlaylists() {
+            setLoading(true, "Fetching playlists..."); playlistSelector.disabled = true; playlistSelector.innerHTML = '<option value="">Loading playlists...</option>';
+             playlists = []; let url = '/me/playlists?limit=50'; let hasMore = true;
              try {
                  while (url && hasMore) {
-                     const data = await spotifyApiCall(url);
-                     if (!data) { hasMore = false; break; }
-                     playlists = playlists.concat(data.items);
-                     url = data.next ? data.next.replace(SPOTIFY_API_BASE_URL, '') : null;
-                     if (!url) hasMore = false;
+                     const data = await spotifyApiCall(url); if (!data) { hasMore = false; break; }
+                     playlists = playlists.concat(data.items); url = data.next ? data.next.replace(SPOTIFY_API_BASE_URL, '') : null; if (!url) hasMore = false;
                  }
                 playlistSelector.innerHTML = '<option value="">-- Select a Playlist --</option>';
                 playlists.forEach(playlist => {
                     if (playlist.owner.id === userId || playlist.collaborative) {
-                        const option = document.createElement('option');
-                        option.value = playlist.id;
-                        option.textContent = `${playlist.name} (${playlist.tracks.total} tracks)`;
-                        playlistSelector.appendChild(option);
+                        const option = document.createElement('option'); option.value = playlist.id; option.textContent = `${playlist.name} (${playlist.tracks.total} tracks)`; playlistSelector.appendChild(option);
                     }
                 });
                  playlistSelector.disabled = false;
-             } catch (error) {
-                 showError("Failed to load playlists.");
-                 playlistSelector.innerHTML = '<option value="">Error loading playlists</option>';
-             } finally {
-                 setLoading(false);
-             }
+             } catch (error) { showError("Failed to load playlists."); playlistSelector.innerHTML = '<option value="">Error loading</option>'; }
+             finally { setLoading(false); }
         }
-        async function handlePlaylistSelect() { /* ... (same as before, loads tracks) ... */
-            selectedPlaylistId = playlistSelector.value;
-            if (!selectedPlaylistId) {
-                resetSortingArea(); return;
-            }
-            const selectedPlaylist = playlists.find(p => p.id === selectedPlaylistId);
-            currentPlaylistName = selectedPlaylist ? selectedPlaylist.name : "Unknown Playlist";
-            currentPlaylistNameEl.textContent = currentPlaylistName;
-             setLoading(true, `Loading tracks for ${currentPlaylistName}...`);
-             resetSortingArea();
-             tracks = [];
-             // Fetch tracks using pagination... (same logic as before)
-              let url = `/playlists/${selectedPlaylistId}/tracks?fields=items(track(id,name,artists(name),album(images),preview_url,uri)),next,total&limit=100`;
-              let hasMore = true; let totalExpected = 0;
-              try {
+        async function handlePlaylistSelect() {
+            selectedPlaylistId = playlistSelector.value; if (!selectedPlaylistId) { resetSortingArea(); return; }
+            const selectedPlaylist = playlists.find(p => p.id === selectedPlaylistId); currentPlaylistName = selectedPlaylist ? selectedPlaylist.name : "Unknown";
+            currentPlaylistNameEl.textContent = currentPlaylistName; setLoading(true, `Loading tracks...`); resetSortingArea(); tracks = [];
+            let url = `/playlists/${selectedPlaylistId}/tracks?fields=items(track(id,name,artists(name),album(images),preview_url,uri)),next,total&limit=100`;
+            let hasMore = true; let totalExpected = 0;
+            try {
                  while (url && hasMore) {
-                     const data = await spotifyApiCall(url);
-                     if (!data) { hasMore = false; break; }
+                     const data = await spotifyApiCall(url); if (!data) { hasMore = false; break; }
                      if (totalExpected === 0) totalExpected = data.total;
-                     const validItems = data.items.filter(item => item.track);
-                     tracks = tracks.concat(validItems);
-                     url = data.next ? data.next.replace(SPOTIFY_API_BASE_URL, '') : null;
-                     if (!url) hasMore = false;
-                      setLoading(true, `Loading tracks... (${tracks.length}/${totalExpected || '?'})`);
+                     const validItems = data.items.filter(item => item.track); tracks = tracks.concat(validItems);
+                     url = data.next ? data.next.replace(SPOTIFY_API_BASE_URL, '') : null; if (!url) hasMore = false;
+                     setLoading(true, `Loading tracks... (${tracks.length}/${totalExpected || '?'})`);
                  }
                 console.log(`Loaded ${tracks.length} tracks.`);
-                if (tracks.length > 0) {
-                    currentTrackIndex = 0;
-                    displayTrack(currentTrackIndex);
-                    enableControls();
-                } else {
-                     showError("This playlist appears to be empty or contains only unreadable tracks.");
-                    resetSortingArea();
-                }
-             } catch (error) {
-                 showError(`Failed to load tracks for ${currentPlaylistName}.`);
-                 resetSortingArea();
-             } finally {
-                  setLoading(false);
-             }
+                if (tracks.length > 0) { currentTrackIndex = 0; displayTrack(currentTrackIndex); enableControls(); }
+                else { showError("Playlist empty or contains unreadable tracks."); resetSortingArea(); }
+             } catch (error) { showError(`Failed to load tracks for ${currentPlaylistName}.`); resetSortingArea(); }
+             finally { setLoading(false); }
         }
-        function resetSortingArea() { /* ... (same as before) ... */
-             currentTrackIndex = -1; tracks = []; keptTracks = [];
-             updateKeepListUI(); updateProgress();
+        function resetSortingArea() {
+             currentTrackIndex = -1; tracks = []; keptTracks = []; updateKeepListUI(); updateProgress();
              trackCoverEl.src = ""; trackTitleEl.textContent = "Track Title"; trackArtistEl.textContent = "Artist Name";
              noPreviewMessageEl.classList.add('hidden'); audioPlayer.pause(); audioPlayer.src = "";
              disableControls(); makePlaylistButton.disabled = true;
@@ -710,297 +457,135 @@
          }
 
         function displayTrack(index) {
-             setLoading(true, "Loading next track...");
-             if (index < 0 || index >= tracks.length) {
-                console.log("End of playlist reached.");
-                handleEndOfPlaylist();
-                setLoading(false);
-                return;
-            }
+             // setLoading happens within this function now for accuracy
+             if (index < 0 || index >= tracks.length) { console.log("End of playlist reached."); handleEndOfPlaylist(); return; }
 
             const item = tracks[index];
-             // Defensively check for item and item.track
-            if (!item || !item.track) {
-                 console.warn("Skipping potentially invalid track data at index:", index, item);
-                 // Automatically move to the next track if current one is bad
-                 moveToNextTrack(); // Use the function to handle index increment and boundary checks
-                 return;
-             }
-            const track = item.track;
+             if (!item || !item.track) { console.warn("Skipping invalid track data at index:", index); moveToNextTrack(); return; }
+             const track = item.track;
+             if (!track.name || !track.artists || !track.album) { console.warn("Skipping track with missing details:", track); moveToNextTrack(); return; }
 
-             // Further check if essential track details are present
-              if (!track.name || !track.artists || !track.album) {
-                 console.warn("Skipping track with missing essential details:", track);
-                 moveToNextTrack();
-                 return;
-             }
+             // Show loading briefly while content updates
+             setLoading(true, "Loading track...");
 
             trackTitleEl.textContent = track.name;
             trackArtistEl.textContent = track.artists.map(artist => artist.name).join(', ');
-
-            let imageUrl = ''; // Default empty, rely on CSS placeholder bg
-            if (track.album.images && track.album.images.length > 0) {
-                 const mediumImage = track.album.images.find(img => img.width >= 250 && img.width <= 400);
-                 imageUrl = mediumImage ? mediumImage.url : track.album.images[0].url;
-            }
-            trackCoverEl.src = imageUrl;
-             trackCoverEl.alt = `Cover art for ${track.name}`;
-
+            let imageUrl = '';
+            if (track.album.images && track.album.images.length > 0) { const mediumImage = track.album.images.find(img => img.width >= 250 && img.width <= 400); imageUrl = mediumImage ? mediumImage.url : track.album.images[0].url; }
+            trackCoverEl.src = imageUrl; trackCoverEl.alt = `Cover art for ${track.name}`;
             updateProgress();
 
-            // Handle audio preview
-            audioPlayer.pause(); // Stop previous track first
+            audioPlayer.pause();
             if (track.preview_url) {
-                audioPlayer.src = track.preview_url;
-                noPreviewMessageEl.classList.add('hidden');
-                 // Attempt to play, catch errors (like browser auto-play policy)
-                 audioPlayer.play()
-                    .then(() => {
-                        // Playback started successfully
-                        console.log("Preview playing for:", track.name);
-                    })
-                    .catch(error => {
-                        console.warn(`Audio auto-play failed for "${track.name}":`, error.message);
-                        // Don't show the 'no preview' message here, as the URL exists
-                        // The browser just blocked auto-play without interaction.
-                        // User might need to click a button first in some browsers/situations
-                        // (though clicking ignore/keep/delete should count as interaction).
-                 });
+                audioPlayer.src = track.preview_url; noPreviewMessageEl.classList.add('hidden');
+                 audioPlayer.play().catch(error => { console.warn(`Audio auto-play failed for "${track.name}":`, error.message); });
             } else {
-                audioPlayer.src = ""; // Clear source if no preview
-                noPreviewMessageEl.classList.remove('hidden');
-                 noPreviewMessageEl.textContent = "No preview available for this track."; // Explicit message
+                audioPlayer.src = ""; noPreviewMessageEl.classList.remove('hidden'); noPreviewMessageEl.textContent = "No preview available for this track.";
             }
-
              enableControls();
+             // Hide loading *after* content is set and playback attempt started
              setLoading(false);
         }
 
-        function updateProgress() { /* ... (same as before) ... */
-            const total = tracks.length;
-            const current = currentTrackIndex + 1;
-            totalSongsEl.textContent = total;
+        function updateProgress() {
+            const total = tracks.length; const current = currentTrackIndex + 1; totalSongsEl.textContent = total;
             currentSongIndexEl.textContent = total === 0 ? 0 : Math.min(current, total);
-            const percentage = total === 0 ? 0 : Math.round((Math.min(current, total) / total) * 100);
-            progressPercentageEl.textContent = `${percentage}%`;
+            const percentage = total === 0 ? 0 : Math.round((Math.min(current, total) / total) * 100); progressPercentageEl.textContent = `${percentage}%`;
         }
-        function enableControls() { /* ... (same as before) ... */
-             ignoreButton.disabled = false; keepButton.disabled = false; deleteButton.disabled = false; }
-        function disableControls() { /* ... (same as before) ... */
-             ignoreButton.disabled = true; keepButton.disabled = true; deleteButton.disabled = true; }
+        function enableControls() { ignoreButton.disabled = false; keepButton.disabled = false; deleteButton.disabled = false; }
+        function disableControls() { ignoreButton.disabled = true; keepButton.disabled = true; deleteButton.disabled = true; }
 
         // --- Sorting Actions ---
-        function handleIgnore() { /* ... (same as before) ... */
-             console.log("Ignored:", tracks[currentTrackIndex]?.track?.name || 'Unknown Track');
-             moveToNextTrack(); }
-        function handleKeep() { /* ... (same as before) ... */
+        function handleIgnore() { console.log("Ignored:", tracks[currentTrackIndex]?.track?.name || 'Track'); moveToNextTrack(); }
+        function handleKeep() {
               const currentItem = tracks[currentTrackIndex];
-             if (currentItem && currentItem.track && currentItem.track.uri) {
-                keptTracks.push({ track: currentItem.track, uri: currentItem.track.uri });
-                console.log("Kept:", currentItem.track.name);
-                updateKeepListUI();
-                moveToNextTrack();
-             } else {
-                 console.error("Cannot keep track: missing track data or URI at index", currentTrackIndex);
-                 showError("Could not add this track to the keep list (invalid data).");
-                 moveToNextTrack();
-             }
+             if (currentItem?.track?.uri) { keptTracks.push({ track: currentItem.track, uri: currentItem.track.uri }); console.log("Kept:", currentItem.track.name); updateKeepListUI(); moveToNextTrack(); }
+             else { console.error("Cannot keep track: invalid data at index", currentTrackIndex); showError("Could not add track (invalid data)."); moveToNextTrack(); }
          }
-        async function handleDelete() { /* ... (same as before) ... */
+        async function handleDelete() {
             if (currentTrackIndex < 0 || currentTrackIndex >= tracks.length) return;
             const trackToDeleteItem = tracks[currentTrackIndex];
-             if (!trackToDeleteItem || !trackToDeleteItem.track || !trackToDeleteItem.track.uri) {
-                 showError("Cannot delete track: invalid data.");
-                 moveToNextTrack(); return;
-             }
+             if (!trackToDeleteItem?.track?.uri) { showError("Cannot delete track: invalid data."); moveToNextTrack(); return; }
              const trackToDelete = trackToDeleteItem.track;
-
-            const confirmed = confirm(`Are you sure you want to PERMANENTLY DELETE "${trackToDelete.name}" from the playlist "${currentPlaylistName}"? This cannot be undone.`);
+            const confirmed = confirm(`DELETE "${trackToDelete.name}" from "${currentPlaylistName}"?\n\nThis cannot be undone.`);
             if (confirmed) {
                  setLoading(true, `Deleting "${trackToDelete.name}"...`);
                 try {
-                    const requestBody = { tracks: [{ uri: trackToDelete.uri }] };
-                    await spotifyApiCall(`/playlists/${selectedPlaylistId}/tracks`, 'DELETE', requestBody);
-                    console.log("Successfully deleted from Spotify.");
-                     tracks.splice(currentTrackIndex, 1);
-                     totalSongsEl.textContent = tracks.length; // Update total immediately
-                     if (currentTrackIndex >= tracks.length) {
-                         handleEndOfPlaylist();
-                     } else {
-                         // Display the NEW track at the current index
-                         displayTrack(currentTrackIndex);
-                     }
-                } catch (error) {
-                    showError(`Failed to delete "${trackToDelete.name}" from the playlist. Check console.`);
-                    // Don't remove locally, but still move to the next logical track for user
-                    moveToNextTrack();
-                } finally {
-                     setLoading(false);
-                }
+                    await spotifyApiCall(`/playlists/${selectedPlaylistId}/tracks`, 'DELETE', { tracks: [{ uri: trackToDelete.uri }] });
+                    console.log("Deleted from Spotify."); tracks.splice(currentTrackIndex, 1); totalSongsEl.textContent = tracks.length;
+                     if (currentTrackIndex >= tracks.length) { handleEndOfPlaylist(); } else { displayTrack(currentTrackIndex); } // Display new track at current index
+                } catch (error) { showError(`Failed to delete "${trackToDelete.name}".`); moveToNextTrack(); } // Move on even if delete failed API side
+                finally { setLoading(false); }
             } else { console.log("Deletion cancelled."); }
         }
-        function moveToNextTrack() {
-            currentTrackIndex++;
-            if (currentTrackIndex >= tracks.length) {
-                handleEndOfPlaylist();
-            } else {
-                displayTrack(currentTrackIndex);
-            }
-        }
-        function handleEndOfPlaylist() { /* ... (same as before) ... */
+        function moveToNextTrack() { currentTrackIndex++; displayTrack(currentTrackIndex); } // displayTrack handles end of list
+        function handleEndOfPlaylist() {
             console.log("Finished sorting playlist!");
-            trackTitleEl.textContent = "Playlist Sorted!";
-            trackArtistEl.textContent = `You've reviewed all tracks. Check the 'Kept Songs' list.`;
-            trackCoverEl.src = ""; audioPlayer.pause(); audioPlayer.src = "";
-            noPreviewMessageEl.classList.add('hidden');
-            disableControls();
-            updateProgress(); // Ensure progress shows 100%
+            trackTitleEl.textContent = "Playlist Sorted!"; trackArtistEl.textContent = `Check the 'Kept Songs' list.`;
+            trackCoverEl.src = ""; audioPlayer.pause(); audioPlayer.src = ""; noPreviewMessageEl.classList.add('hidden');
+            disableControls(); updateProgress(); // Ensure progress shows 100% or final state
         }
 
         // --- Keep List and Playlist Creation ---
         function updateKeepListUI() {
-            keptSongsListEl.innerHTML = ''; // Clear list
-            const isLoadingState = isLoading(); // Check loading state once
-
+            keptSongsListEl.innerHTML = ''; const isLoadingState = isLoading();
             keptTracks.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.dataset.trackIndex = index; // Store index for easy access
-
-                const container = document.createElement('div');
-                container.className = 'kept-song-item-container';
-
-                const textDiv = document.createElement('div');
-                textDiv.className = 'kept-song-text';
-                textDiv.textContent = `${item.track.name}`; // Main title
-                 const artistSpan = document.createElement('span');
-                 artistSpan.textContent = item.track.artists.map(a => a.name).join(', ');
-                 textDiv.appendChild(artistSpan);
-
-                 const buttonsDiv = document.createElement('div');
-                 buttonsDiv.className = 'kept-song-buttons';
-
-                // Play Button
-                const playBtn = document.createElement('button');
-                playBtn.className = 'kept-list-btn kept-play-btn';
-                playBtn.title = 'Play Preview';
-                playBtn.textContent = '▶️'; // Play symbol
-                 playBtn.disabled = isLoadingState || !item.track.preview_url; // Disable if loading or no preview
-                 if (!item.track.preview_url) {
-                     playBtn.title = 'No Preview Available';
-                 }
-                 buttonsDiv.appendChild(playBtn);
-
-                // Remove Button
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'kept-list-btn kept-remove-btn';
-                removeBtn.title = 'Remove from list';
-                removeBtn.textContent = '🗑️'; // Trash can symbol
-                 removeBtn.disabled = isLoadingState; // Disable if loading
-                 buttonsDiv.appendChild(removeBtn);
-
-                 container.appendChild(textDiv);
-                 container.appendChild(buttonsDiv);
-                 li.appendChild(container);
-                keptSongsListEl.appendChild(li);
+                const li = document.createElement('li'); li.dataset.trackIndex = index;
+                const container = document.createElement('div'); container.className = 'kept-song-item-container';
+                const textDiv = document.createElement('div'); textDiv.className = 'kept-song-text';
+                textDiv.textContent = `${item.track.name}`; const artistSpan = document.createElement('span');
+                artistSpan.textContent = item.track.artists.map(a => a.name).join(', '); textDiv.appendChild(artistSpan);
+                const buttonsDiv = document.createElement('div'); buttonsDiv.className = 'kept-song-buttons';
+                const playBtn = document.createElement('button'); playBtn.className = 'kept-list-btn kept-play-btn'; playBtn.textContent = '▶️';
+                playBtn.disabled = isLoadingState || !item.track.preview_url; playBtn.title = item.track.preview_url ? 'Play Preview' : 'No Preview Available';
+                const removeBtn = document.createElement('button'); removeBtn.className = 'kept-list-btn kept-remove-btn'; removeBtn.title = 'Remove from list'; removeBtn.textContent = '🗑️'; removeBtn.disabled = isLoadingState;
+                buttonsDiv.appendChild(playBtn); buttonsDiv.appendChild(removeBtn); container.appendChild(textDiv); container.appendChild(buttonsDiv); li.appendChild(container); keptSongsListEl.appendChild(li);
             });
              makePlaylistButton.disabled = keptTracks.length === 0 || isLoadingState;
         }
-
-        // --- NEW: Handle clicks on buttons within the kept list ---
         function handleKeptListInteraction(event) {
-            const playButton = event.target.closest('.kept-play-btn');
-            const removeButton = event.target.closest('.kept-remove-btn');
-
-            if (!playButton && !removeButton) {
-                return; // Click was not on a button we care about
-            }
-            if (isLoading()) return; // Don't do anything if loading
-
-            const listItem = event.target.closest('li');
-            if (!listItem || !listItem.dataset.trackIndex) {
-                 console.error("Could not find track index for clicked item.");
-                 return;
-            }
+            const playButton = event.target.closest('.kept-play-btn'); const removeButton = event.target.closest('.kept-remove-btn');
+            if (!playButton && !removeButton || isLoading()) return;
+            const listItem = event.target.closest('li'); if (!listItem?.dataset?.trackIndex) return;
             const trackIndex = parseInt(listItem.dataset.trackIndex, 10);
-
-            if (isNaN(trackIndex) || trackIndex < 0 || trackIndex >= keptTracks.length) {
-                 console.error("Invalid track index:", trackIndex);
-                 return;
-            }
-
+            if (isNaN(trackIndex) || trackIndex < 0 || trackIndex >= keptTracks.length) { console.error("Invalid kept track index:", trackIndex); return; }
              const trackItem = keptTracks[trackIndex];
-
             if (playButton) {
-                console.log("Play preview requested for kept track:", trackItem.track.name);
-                 if (trackItem.track.preview_url) {
-                     audioPlayer.pause(); // Stop current playback
-                     audioPlayer.src = trackItem.track.preview_url;
-                     audioPlayer.play().catch(e => {
-                         console.warn("Could not play kept track preview:", e.message);
-                         alert(`Could not automatically play preview for "${trackItem.track.name}". Browser restrictions might apply.`);
-                     });
-                 } else {
-                     alert(`No preview available for "${trackItem.track.name}".`);
-                 }
-            } else if (removeButton) {
-                console.log("Remove requested for kept track:", trackItem.track.name);
-                // Remove the track from the keptTracks array
-                keptTracks.splice(trackIndex, 1);
-                // Re-render the UI
-                updateKeepListUI();
-                // Update the Make Playlist button state (already handled in updateKeepListUI)
-            }
+                 if (trackItem.track.preview_url) { audioPlayer.pause(); audioPlayer.src = trackItem.track.preview_url; audioPlayer.play().catch(e => { console.warn("Could not play kept track preview:", e.message); alert(`Could not play preview for "${trackItem.track.name}".`); }); }
+                 else { alert(`No preview available for "${trackItem.track.name}".`); }
+            } else if (removeButton) { keptTracks.splice(trackIndex, 1); updateKeepListUI(); }
         }
-
-        async function handleMakePlaylist() { /* ... (same as before) ... */
-            if (keptTracks.length === 0 || !userId) {
-                showError("No songs in the 'kept' list or user ID not found."); return;
-            }
-            const defaultName = `Sorted - ${currentPlaylistName}`;
-            const newPlaylistName = prompt("Enter a name for the new playlist:", defaultName);
-            if (!newPlaylistName || newPlaylistName.trim() === "") {
-                alert("Playlist creation cancelled."); return;
-            }
+        async function handleMakePlaylist() {
+            if (keptTracks.length === 0 || !userId) { showError("No songs kept or user ID missing."); return; }
+            const defaultName = `Sorted - ${currentPlaylistName}`; const newPlaylistName = prompt("Enter name for new playlist:", defaultName);
+            if (!newPlaylistName?.trim()) { alert("Playlist creation cancelled."); return; }
              setLoading(true, "Creating new playlist...");
             try {
-                const createPlaylistBody = { name: newPlaylistName, public: false, description: `Songs kept from sorting '${currentPlaylistName}'.` };
-                const newPlaylist = await spotifyApiCall(`/users/${userId}/playlists`, 'POST', createPlaylistBody);
-                 if (!newPlaylist || !newPlaylist.id) { throw new Error("Failed to create playlist (API response invalid)."); }
-                const newPlaylistId = newPlaylist.id;
-                 console.log(`Created playlist "${newPlaylistName}" with ID: ${newPlaylistId}`);
-
+                const newPlaylist = await spotifyApiCall(`/users/${userId}/playlists`, 'POST', { name: newPlaylistName.trim(), public: false, description: `Songs kept from sorting '${currentPlaylistName}'.` });
+                 if (!newPlaylist?.id) { throw new Error("Failed to create playlist (API response invalid)."); }
                  setLoading(true, `Adding ${keptTracks.length} songs...`);
-                const trackUris = keptTracks.map(item => item.uri);
-                const batchSize = 100; let tracksAddedCount = 0;
-                for (let i = 0; i < trackUris.length; i += batchSize) {
-                    const batch = trackUris.slice(i, i + batchSize);
-                    const addTracksBody = { uris: batch };
-                     setLoading(true, `Adding songs... (${tracksAddedCount}/${keptTracks.length})`);
-                    await spotifyApiCall(`/playlists/${newPlaylistId}/tracks`, 'POST', addTracksBody);
-                    tracksAddedCount += batch.length;
-                    console.log(`Added batch of ${batch.length} tracks.`);
-                     await new Promise(resolve => setTimeout(resolve, 200));
-                }
-                alert(`Successfully created playlist "${newPlaylistName}" with ${tracksAddedCount} songs!`);
-                 // Maybe clear kept list after success?
-                 // keptTracks = [];
-                 // updateKeepListUI();
-            } catch (error) {
-                showError(`Failed to create playlist or add tracks: ${error.message}. Check console.`);
-            } finally {
-                 setLoading(false);
-            }
+                const trackUris = keptTracks.map(item => item.uri).filter(uri => uri); // Ensure no null/undefined uris
+                 if (trackUris.length !== keptTracks.length) console.warn("Some kept tracks had missing URIs!");
+                 if (trackUris.length > 0) {
+                     const batchSize = 100; let tracksAddedCount = 0;
+                     for (let i = 0; i < trackUris.length; i += batchSize) {
+                         const batch = trackUris.slice(i, i + batchSize); setLoading(true, `Adding songs... (${tracksAddedCount}/${trackUris.length})`);
+                         await spotifyApiCall(`/playlists/${newPlaylist.id}/tracks`, 'POST', { uris: batch }); tracksAddedCount += batch.length; await new Promise(resolve => setTimeout(resolve, 200)); // Prevent rate limiting
+                     }
+                     alert(`Successfully created playlist "${newPlaylistName}" with ${tracksAddedCount} songs!`);
+                 } else {
+                     alert(`Playlist "${newPlaylistName}" created, but no valid tracks were available to add.`);
+                 }
+                 // Optional: Clear list after creation
+                 // keptTracks = []; updateKeepListUI();
+            } catch (error) { showError(`Failed to create playlist or add tracks: ${error.message}.`); }
+            finally { setLoading(false); }
         }
-        function resetAppState() { /* ... (same as before) ... */
-            accessToken = null; codeVerifier = null; userId = null; playlists = [];
-            selectedPlaylistId = null; currentPlaylistName = "";
-            resetSortingArea(); // Clears tracks, keptTracks, UI etc.
-            playlistSelector.innerHTML = '<option value="">Log in to load playlists</option>';
-            playlistSelector.disabled = true;
+        function resetAppState() {
+            accessToken = null; codeVerifier = null; userId = null; playlists = []; selectedPlaylistId = null; currentPlaylistName = "";
+            resetSortingArea(); playlistSelector.innerHTML = '<option value="">Log in to load</option>'; playlistSelector.disabled = true;
         }
-         function isLoading() { // Helper to check loading state
-             return loadingOverlay.style.display === 'flex';
-         }
+         function isLoading() { return loadingOverlay.style.display === 'flex'; }
 
         // --- Event Listeners ---
         loginButton.addEventListener('click', redirectToSpotifyLogin);
@@ -1009,35 +594,25 @@
         keepButton.addEventListener('click', handleKeep);
         deleteButton.addEventListener('click', handleDelete);
         makePlaylistButton.addEventListener('click', handleMakePlaylist);
-        // NEW: Listener for kept list interactions
         keptSongsListEl.addEventListener('click', handleKeptListInteraction);
 
-        document.addEventListener('keydown', (event) => { /* ... (same as before) ... */
-            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || isLoading()) return;
-            if (mainApp.style.display !== 'flex') return;
+        document.addEventListener('keydown', (event) => {
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || isLoading() || mainApp.style.display !== 'flex') return;
             switch (event.key) {
                 case 'ArrowLeft': if (!ignoreButton.disabled) { event.preventDefault(); handleIgnore(); } break;
                 case 'ArrowRight': if (!keepButton.disabled) { event.preventDefault(); handleKeep(); } break;
                 case 'Backspace': if (!deleteButton.disabled) { event.preventDefault(); handleDelete(); } break;
             }
          });
-
-        audioPlayer.addEventListener('error', (e) => { /* ... (same as before) ... */
-             console.error("Audio Player Error:", e);
-             if (!audioPlayer.currentSrc && !noPreviewMessageEl.classList.contains('hidden')) {
-                 // This is likely the expected state when no preview URL was set. Do nothing.
-             } else if (audioPlayer.error) {
-                  // Log more specific error if available
-                  console.error("Audio Error Code:", audioPlayer.error.code, "Message:", audioPlayer.error.message);
-                  // Don't necessarily show an alert for every minor error, could be annoying
-                  // Only update if it's not already showing 'no preview'
-                  if (noPreviewMessageEl.classList.contains('hidden')) {
-                      noPreviewMessageEl.textContent = "Audio preview error.";
-                      noPreviewMessageEl.classList.remove('hidden');
-                  }
+        audioPlayer.addEventListener('error', (e) => {
+             // Only log significant errors, not the expected 'empty src' when no preview exists
+             if (audioPlayer.error && audioPlayer.error.code !== MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED && audioPlayer.currentSrc) {
+                  console.error("Audio Player Error:", audioPlayer.error.code, audioPlayer.error.message, "Src:", audioPlayer.currentSrc);
+             } else if (!audioPlayer.currentSrc && !noPreviewMessageEl.classList.contains('hidden')) {
+                 // This is the expected state when no preview URL was provided. Quietly ignore.
              }
          });
-         audioPlayer.addEventListener('canplay', () => { /* ... (no change needed here) ... */ });
+         audioPlayer.addEventListener('canplay', () => { /* Ready to play (if src is valid) */ });
 
         // --- Initial Load ---
         handleRedirect();
