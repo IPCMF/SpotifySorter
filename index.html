@@ -457,33 +457,54 @@
          }
 
         function displayTrack(index) {
-             // setLoading happens within this function now for accuracy
-             if (index < 0 || index >= tracks.length) { console.log("End of playlist reached."); handleEndOfPlaylist(); return; }
+             setLoading(true, "Loading next track...");
+             if (index < 0 || index >= tracks.length) {
+                // ... (rest of end of playlist logic)
+                setLoading(false);
+                return;
+            }
 
             const item = tracks[index];
-             if (!item || !item.track) { console.warn("Skipping invalid track data at index:", index); moveToNextTrack(); return; }
-             const track = item.track;
-             if (!track.name || !track.artists || !track.album) { console.warn("Skipping track with missing details:", track); moveToNextTrack(); return; }
+            if (!item || !item.track) {
+                // ... (rest of skipping logic)
+                 moveToNextTrack();
+                 return;
+             }
+            const track = item.track;
 
-             // Show loading briefly while content updates
-             setLoading(true, "Loading track...");
+            // *** ADD THIS LOGGING LINE ***
+            console.log(`Displaying Track #${index}:`, JSON.stringify(track, null, 2)); // Log the whole track object nicely formatted
 
-            trackTitleEl.textContent = track.name;
-            trackArtistEl.textContent = track.artists.map(artist => artist.name).join(', ');
-            let imageUrl = '';
-            if (track.album.images && track.album.images.length > 0) { const mediumImage = track.album.images.find(img => img.width >= 250 && img.width <= 400); imageUrl = mediumImage ? mediumImage.url : track.album.images[0].url; }
-            trackCoverEl.src = imageUrl; trackCoverEl.alt = `Cover art for ${track.name}`;
-            updateProgress();
+             if (!track.name || !track.artists || !track.album) {
+                // ... (rest of skipping logic)
+                 moveToNextTrack();
+                 return;
+             }
 
-            audioPlayer.pause();
-            if (track.preview_url) {
-                audioPlayer.src = track.preview_url; noPreviewMessageEl.classList.add('hidden');
-                 audioPlayer.play().catch(error => { console.warn(`Audio auto-play failed for "${track.name}":`, error.message); });
-            } else {
-                audioPlayer.src = ""; noPreviewMessageEl.classList.remove('hidden'); noPreviewMessageEl.textContent = "No preview available for this track.";
-            }
+            // ... (rest of setting title, artist, cover) ...
+             trackTitleEl.textContent = track.name;
+             trackArtistEl.textContent = track.artists.map(artist => artist.name).join(', ');
+             // ... set cover image ...
+
+             updateProgress();
+
+             // Handle audio preview
+             audioPlayer.pause();
+             if (track.preview_url) { // Check remains the same
+                 console.log(`   Found preview_url: ${track.preview_url}`); // Log if found
+                 audioPlayer.src = track.preview_url;
+                 noPreviewMessageEl.classList.add('hidden');
+                 audioPlayer.play()
+                    .then(() => { console.log("   Preview auto-play started."); })
+                    .catch(error => { console.warn(`   Audio auto-play failed for "${track.name}":`, error.message); });
+             } else {
+                 console.log("   No preview_url found for this track."); // Log if not found
+                 audioPlayer.src = "";
+                 noPreviewMessageEl.classList.remove('hidden');
+                 noPreviewMessageEl.textContent = "No preview available for this track.";
+             }
+
              enableControls();
-             // Hide loading *after* content is set and playback attempt started
              setLoading(false);
         }
 
@@ -528,21 +549,31 @@
 
         // --- Keep List and Playlist Creation ---
         function updateKeepListUI() {
-            keptSongsListEl.innerHTML = ''; const isLoadingState = isLoading();
+            keptSongsListEl.innerHTML = '';
+            const isLoadingState = isLoading();
+
             keptTracks.forEach((item, index) => {
-                const li = document.createElement('li'); li.dataset.trackIndex = index;
-                const container = document.createElement('div'); container.className = 'kept-song-item-container';
-                const textDiv = document.createElement('div'); textDiv.className = 'kept-song-text';
-                textDiv.textContent = `${item.track.name}`; const artistSpan = document.createElement('span');
-                artistSpan.textContent = item.track.artists.map(a => a.name).join(', '); textDiv.appendChild(artistSpan);
-                const buttonsDiv = document.createElement('div'); buttonsDiv.className = 'kept-song-buttons';
-                const playBtn = document.createElement('button'); playBtn.className = 'kept-list-btn kept-play-btn'; playBtn.textContent = '▶️';
-                playBtn.disabled = isLoadingState || !item.track.preview_url; playBtn.title = item.track.preview_url ? 'Play Preview' : 'No Preview Available';
-                const removeBtn = document.createElement('button'); removeBtn.className = 'kept-list-btn kept-remove-btn'; removeBtn.title = 'Remove from list'; removeBtn.textContent = '🗑️'; removeBtn.disabled = isLoadingState;
-                buttonsDiv.appendChild(playBtn); buttonsDiv.appendChild(removeBtn); container.appendChild(textDiv); container.appendChild(buttonsDiv); li.appendChild(container); keptSongsListEl.appendChild(li);
-            });
+                // *** ADD THIS LOGGING LINE ***
+                console.log(`Updating Kept List UI for index ${index}: Has preview_url?`, !!item.track.preview_url, item.track.name);
+
+                const li = document.createElement('li');
+                li.dataset.trackIndex = index;
+                // ... (rest of creating the li content, buttons etc.) ...
+
+                 // Make sure the play button disable logic still uses the check
+                 const playBtn = document.createElement('button');
+                 // ... (set classes etc.) ...
+                 playBtn.disabled = isLoadingState || !item.track.preview_url; // Correct check
+                 if (!item.track.preview_url) {
+                     playBtn.title = 'No Preview Available';
+                 } else {
+                      playBtn.title = 'Play Preview';
+                 }
+                 // ... (append buttons etc.) ...
+                 keptSongsListEl.appendChild(li);
+             });
              makePlaylistButton.disabled = keptTracks.length === 0 || isLoadingState;
-        }
+         }
         function handleKeptListInteraction(event) {
             const playButton = event.target.closest('.kept-play-btn'); const removeButton = event.target.closest('.kept-remove-btn');
             if (!playButton && !removeButton || isLoading()) return;
