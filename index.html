@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Playlist Sorter</title>
+    <title>Spotify Playlist Sorter (SDK)</title>
+    <!-- Include the Web Playback SDK script -->
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <style>
+        /* --- Styles remain largely the same as the previous version --- */
         :root {
             --primary-color: #1DB954; /* Spotify Green */
             --secondary-color: #191414; /* Spotify Black */
@@ -15,199 +18,61 @@
             --delete-hover: #D62828;
             --icon-button-bg: rgba(80, 80, 80, 0.6);
             --icon-button-hover: rgba(100, 100, 100, 0.9);
+            --warning-color: #FFA500; /* Orange for warnings */
         }
-
-        html, body {
-             height: 100%; /* Ensure body takes full height */
-             margin: 0;
-             padding: 0;
-             overflow: hidden; /* Prevent body scrollbars */
-        }
-
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh; /* Use min-height for flexibility */
+            background-color: var(--secondary-color); color: var(--text-color);
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
-
         #app-container {
-            display: flex;
-            width: 95%;
-            max-width: 1200px;
-            height: 90vh; /* Set a fixed viewport height percentage */
-            max-height: 800px; /* Optional: Max height in pixels */
-            background-color: rgba(40, 40, 40, 0.8);
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            overflow: hidden; /* Crucial: contain children */
+            display: flex; width: 95%; max-width: 1200px; height: 90vh; max-height: 800px;
+            background-color: rgba(40, 40, 40, 0.8); border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); overflow: hidden;
         }
-
-        /* --- Login --- */
-        #login-section {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%; /* Fill container */
-            padding: 40px;
-            text-align: center;
-        }
-
-        #login-button {
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 1.2em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
+        /* Login Section */
+        #login-section { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 40px; text-align: center; }
+        #login-button { background-color: var(--primary-color); color: var(--text-color); border: none; padding: 15px 30px; border-radius: 50px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease; }
         #login-button:hover { background-color: var(--button-hover); }
-
-        /* --- Main App --- */
-        #main-app {
-            display: none; /* Hidden by default */
-            flex-direction: row;
-            width: 100%;
-            height: 100%; /* Fill container */
-        }
-
-        /* --- Sidebar (Keep List) --- */
-        #sidebar {
-            width: 280px;
-            flex-shrink: 0;
-            background-color: rgba(25, 20, 20, 0.7);
-            padding: 20px;
-            display: flex; /* Use flexbox for layout */
-            flex-direction: column; /* Stack children vertically */
-            overflow: hidden; /* Hide overflow initially, children will handle scroll */
-            border-right: 1px solid rgba(100, 100, 100, 0.5);
-            height: 100%; /* Take full height of parent (#main-app) */
-            box-sizing: border-box; /* Include padding in height calculation */
-        }
-
-        #sidebar h3 {
-            margin-top: 0;
-            margin-bottom: 10px; /* Space below header */
-            color: var(--primary-color);
-            border-bottom: 1px solid var(--light-gray);
-            padding-bottom: 10px;
-            flex-shrink: 0; /* Prevent header shrinking */
-        }
-
-        #kept-songs-list {
-            list-style: none;
-            padding: 0;
-            margin: 0; /* Remove default margins */
-            flex-grow: 1; /* Allow list to take available vertical space */
-            overflow-y: auto; /* <<< ADD SCROLLING HERE */
-            overflow-x: hidden; /* Hide horizontal scrollbar */
-            /* border: 1px solid red; /* Debugging border */
-        }
-
-        #kept-songs-list li {
-            font-size: 0.9em;
-            padding: 8px 5px;
-            border-bottom: 1px solid rgba(80, 80, 80, 0.5);
-            gap: 5px;
-        }
-
-        .kept-song-item-container {
-             display: flex;
-             justify-content: space-between;
-             align-items: center;
-             width: 100%;
-             gap: 8px;
-        }
-        .kept-song-text {
-            flex-grow: 1;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-        .kept-song-text span {
-            font-size: 0.8em;
-            color: var(--light-gray);
-            display: block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        /* Main App */
+        #main-app { display: none; flex-direction: row; width: 100%; height: 100%; }
+        /* Sidebar */
+        #sidebar { width: 280px; flex-shrink: 0; background-color: rgba(25, 20, 20, 0.7); padding: 20px; display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid rgba(100, 100, 100, 0.5); height: 100%; box-sizing: border-box; }
+        #sidebar h3 { margin-top: 0; margin-bottom: 10px; color: var(--primary-color); border-bottom: 1px solid var(--light-gray); padding-bottom: 10px; flex-shrink: 0; }
+        #kept-songs-list { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; overflow-x: hidden; }
+        #kept-songs-list li { font-size: 0.9em; padding: 8px 5px; border-bottom: 1px solid rgba(80, 80, 80, 0.5); gap: 5px; }
+        .kept-song-item-container { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px; }
+        .kept-song-text { flex-grow: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .kept-song-text span { font-size: 0.8em; color: var(--light-gray); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .kept-song-buttons { display: flex; gap: 5px; flex-shrink: 0; }
-        .kept-list-btn {
-            background: var(--icon-button-bg); border: none; color: var(--text-color);
-            border-radius: 4px; padding: 4px 6px; cursor: pointer; font-size: 0.9em;
-            line-height: 1; transition: background-color 0.2s ease;
-        }
+        .kept-list-btn { background: var(--icon-button-bg); border: none; color: var(--text-color); border-radius: 4px; padding: 4px 6px; cursor: pointer; font-size: 0.9em; line-height: 1; transition: background-color 0.2s ease; }
         .kept-list-btn:hover { background: var(--icon-button-hover); }
         .kept-list-btn.kept-remove-btn:hover { background: var(--delete-color); }
         .kept-list-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        #make-playlist-button {
-            background-color: var(--primary-color); color: var(--text-color); border: none;
-            padding: 12px 20px; border-radius: 50px; font-size: 1em; font-weight: bold;
-            cursor: pointer; transition: background-color 0.2s ease;
-            margin-top: 15px; /* Space above button */
-            flex-shrink: 0; /* Prevent button shrinking */
-        }
+        #make-playlist-button { background-color: var(--primary-color); color: var(--text-color); border: none; padding: 12px 20px; border-radius: 50px; font-size: 1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease; margin-top: 15px; flex-shrink: 0; }
         #make-playlist-button:hover { background-color: var(--button-hover); }
         #make-playlist-button:disabled { background-color: var(--light-gray); cursor: not-allowed; }
-
-        /* --- Main Content Area --- */
-        #content-area {
-            flex-grow: 1; /* Takes remaining space */
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            overflow: hidden; /* Prevent its own scrollbars unless necessary */
-            height: 100%; /* Fill container */
-            box-sizing: border-box; /* Include padding in height calculation */
-        }
-
-        /* Playlist Selection & Progress */
-        #playlist-selector-container { width: 100%; margin-bottom: 20px; text-align: center; flex-shrink: 0;}
+        /* Content Area */
+        #content-area { flex-grow: 1; padding: 30px; display: flex; flex-direction: column; align-items: center; position: relative; overflow: hidden; height: 100%; box-sizing: border-box; }
+        #playlist-selector-container { width: 100%; margin-bottom: 15px; text-align: center; flex-shrink: 0;} /* Reduced margin */
         #playlist-selector { padding: 10px 15px; border-radius: 5px; border: 1px solid var(--light-gray); background-color: var(--secondary-color); color: var(--text-color); font-size: 1em; max-width: 400px; }
         #playlist-selector:disabled { opacity: 0.6; }
-        #sorting-info { width: 100%; text-align: center; margin-bottom: 25px; color: var(--light-gray); font-size: 0.9em; flex-shrink: 0;}
+        /* Player Status */
+        #player-status { font-size: 0.8em; color: var(--light-gray); margin-bottom: 10px; min-height: 1.2em; text-align: center; flex-shrink: 0; }
+        #player-status.warning { color: var(--warning-color); font-weight: bold; }
+        /* Sorting Info */
+        #sorting-info { width: 100%; text-align: center; margin-bottom: 20px; color: var(--light-gray); font-size: 0.9em; flex-shrink: 0;}
         #sorting-info strong { color: var(--text-color); }
         #progress-percentage { font-weight: bold; color: var(--primary-color); margin-left: 10px; }
-
         /* Track Display */
-        #track-display {
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-            margin-bottom: 30px; /* Space before controls */
-            flex-shrink: 0; /* Prevent shrinking when content area is small */
-             /* Removed min-height, rely on flexbox centering */
-             width: 100%;
-        }
+        #track-display { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 25px; flex-shrink: 0; width: 100%; }
         #track-cover { width: 250px; height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); background-color: #333; }
         #track-title { font-size: 1.4em; font-weight: bold; margin-bottom: 5px; max-width: 90%; }
         #track-artist { font-size: 1em; color: var(--light-gray); max-width: 90%; }
-        #no-preview-message { color: var(--light-gray); font-style: italic; margin-top: 10px; }
-
-        /* Control Buttons */
-        #controls {
-            display: flex; justify-content: center; align-items: center;
-            width: 100%;
-            margin-top: auto; /* Push controls towards bottom of content area */
-            padding-bottom: 20px; /* Add some padding at the bottom */
-             flex-shrink: 0;
-        }
-        .control-button {
-            background-color: rgba(80, 80, 80, 0.7); color: var(--text-color); border: none;
-            border-radius: 50%; width: 60px; height: 60px; font-size: 1.8em; font-weight: bold;
-            cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease;
-            display: flex; justify-content: center; align-items: center; margin: 0 25px;
-        }
+        /* Controls */
+        #controls { display: flex; justify-content: center; align-items: center; width: 100%; margin-top: auto; padding-bottom: 20px; flex-shrink: 0; }
+        .control-button { background-color: rgba(80, 80, 80, 0.7); color: var(--text-color); border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 1.8em; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease; display: flex; justify-content: center; align-items: center; margin: 0 25px; }
         .control-button:hover { background-color: rgba(100, 100, 100, 0.9); }
         .control-button:active { transform: scale(0.95); }
         .control-button:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -215,17 +80,10 @@
         #delete-button:hover { background-color: var(--delete-hover); }
         #ignore-button { order: -1; }
         #keep-button   { order: 1;  }
-
-        /* Loading / Message Overlay */
-        #loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.75); color: white;
-            display: none; justify-content: center; align-items: center;
-            font-size: 1.5em; z-index: 1000; text-align: center;
-        }
-         /* Utility Classes */
+        /* Loading Overlay */
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); color: white; display: none; justify-content: center; align-items: center; font-size: 1.5em; z-index: 1000; text-align: center; }
+        /* Utility */
         .hidden { display: none !important; }
-
     </style>
 </head>
 <body>
@@ -233,8 +91,8 @@
     <div id="app-container">
         <!-- Login Section -->
         <section id="login-section">
-            <h1>Spotify Playlist Sorter</h1>
-            <p>Log in to start sorting your playlists like Tinder!</p>
+            <h1>Spotify Playlist Sorter (SDK)</h1>
+            <p>Log in to sort playlists with full track playback (Spotify Premium required).</p>
             <button id="login-button">Login with Spotify</button>
         </section>
 
@@ -243,9 +101,7 @@
             <!-- Sidebar -->
             <aside id="sidebar">
                 <h3>Kept Songs</h3>
-                <ul id="kept-songs-list">
-                    <!-- Kept songs will be added here -->
-                </ul>
+                <ul id="kept-songs-list"></ul>
                 <button id="make-playlist-button" disabled>Make New Playlist</button>
             </aside>
 
@@ -258,6 +114,9 @@
                     </select>
                 </div>
 
+                <!-- Player Status Area -->
+                <div id="player-status"></div>
+
                 <div id="sorting-info">
                     Sorting: <strong id="current-playlist-name">None</strong>
                     (<span id="current-song-index">0</span>/<span id="total-songs">0</span>)
@@ -268,32 +127,34 @@
                     <img id="track-cover" src="" alt="Track Cover Art">
                     <h2 id="track-title">Track Title</h2>
                     <p id="track-artist">Artist Name</p>
-                    <p id="no-preview-message" class="hidden">No preview available for this track.</p>
+                    <!-- Removed no-preview message -->
                 </div>
 
                 <div id="controls">
-                    <button id="ignore-button" class="control-button" title="Ignore (Left Arrow)" disabled>&#x2190;</button>
+                    <button id="ignore-button" class="control-button" title="Ignore (Left Arrow)" disabled>←</button>
                     <button id="delete-button" class="control-button" title="Delete from Original (Backspace)" disabled>Delete</button>
-                    <button id="keep-button" class="control-button" title="Keep (Right Arrow)" disabled>&#x2192;</button>
+                    <button id="keep-button" class="control-button" title="Keep (Right Arrow)" disabled>→</button>
                 </div>
 
-                 <!-- Hidden Audio Player -->
-                 <audio id="audio-player" preload="auto"></audio>
+                <!-- Removed hidden Audio Player -->
 
             </section>
 
         </main>
-         <!-- Loading/Processing Overlay -->
+         <!-- Loading Overlay -->
          <div id="loading-overlay"> Processing... </div>
     </div>
 
     <script>
         // --- Configuration ---
-        const CLIENT_ID = "b216d27a627045e4a18b9276628b62f2"; // <--- Your Client ID
+        const CLIENT_ID = "b216d27a627045e4a18b9276628b62f2"; // Your Client ID
         const REDIRECT_URI = window.location.origin + window.location.pathname;
+        // *** ADDED SDK SCOPES ***
         const SCOPES = [
             "user-read-private", "playlist-read-private", "playlist-read-collaborative",
-            "playlist-modify-public", "playlist-modify-private"
+            "playlist-modify-public", "playlist-modify-private",
+            // SDK Specific Scopes:
+            "streaming", "user-read-playback-state", "user-modify-playback-state"
         ].join(" ");
         const SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize";
         const SPOTIFY_TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token";
@@ -303,12 +164,18 @@
         let accessToken = null; let codeVerifier = null; let userId = null;
         let playlists = []; let selectedPlaylistId = null; let currentPlaylistName = "";
         let tracks = []; let currentTrackIndex = -1; let keptTracks = [];
+        // *** SDK State ***
+        let spotifyPlayer = null; // The SDK player instance
+        let deviceId = null;      // The unique ID for this browser player
+        let isSdkReady = false;   // Flag if SDK player is connected
+        let currentTrackUri = null; // URI of the track currently displayed
 
         // --- UI Elements ---
         const loginSection = document.getElementById('login-section');
         const mainApp = document.getElementById('main-app');
         const loginButton = document.getElementById('login-button');
         const playlistSelector = document.getElementById('playlist-selector');
+        const playerStatusEl = document.getElementById('player-status'); // Added Player Status Element
         const currentPlaylistNameEl = document.getElementById('current-playlist-name');
         const currentSongIndexEl = document.getElementById('current-song-index');
         const totalSongsEl = document.getElementById('total-songs');
@@ -316,8 +183,8 @@
         const trackCoverEl = document.getElementById('track-cover');
         const trackTitleEl = document.getElementById('track-title');
         const trackArtistEl = document.getElementById('track-artist');
-        const noPreviewMessageEl = document.getElementById('no-preview-message');
-        const audioPlayer = document.getElementById('audio-player');
+        // Removed noPreviewMessageEl
+        // Removed audioPlayer
         const ignoreButton = document.getElementById('ignore-button');
         const keepButton = document.getElementById('keep-button');
         const deleteButton = document.getElementById('delete-button');
@@ -325,92 +192,249 @@
         const makePlaylistButton = document.getElementById('make-playlist-button');
         const loadingOverlay = document.getElementById('loading-overlay');
 
-        // --- PKCE Helper Functions ---
-        function generateRandomString(length) {
+        // --- PKCE Helper Functions (Same as before) ---
+        function generateRandomString(length) { /* ... */
             const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let text = '';
             for (let i = 0; i < length; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)); }
             return text;
          }
-        async function generateCodeChallenge(codeVerifier) {
+        async function generateCodeChallenge(codeVerifier) { /* ... */
              const encoder = new TextEncoder(); const data = encoder.encode(codeVerifier);
              const digest = await window.crypto.subtle.digest('SHA-256', data);
              return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
         }
 
-        // --- Spotify API Call Helper ---
+        // --- Spotify API Call Helper (Same as before, handles 401) ---
         async function spotifyApiCall(endpoint, method = 'GET', body = null, retries = 1) {
+            // Make sure accessToken is valid before calling
+             if (!accessToken) {
+                 console.error("No access token available for API call.");
+                 showError("Authentication error. Please log in again.");
+                 logout(); // Force logout if token is missing
+                 return null;
+             }
             const url = SPOTIFY_API_BASE_URL + endpoint;
             const headers = { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
             const config = { method: method, headers: headers };
             if (body) config.body = JSON.stringify(body);
             try {
                 const response = await fetch(url, config);
-                if (response.status === 401 && retries > 0) { console.warn("Access token expired or invalid. Re-authenticating."); clearAuthData(); redirectToSpotifyLogin(); return null; }
+                if (response.status === 401 && retries > 0) { console.warn("API token expired. Re-authenticating."); clearAuthData(); redirectToSpotifyLogin(); return null; }
+                // Handle other player-specific errors gracefully
+                if (!response.ok && (endpoint.includes('/me/player/play') || endpoint.includes('/me/player/pause'))) {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.warn(`Player API Error (${response.status}): ${response.statusText}`, errorData);
+                    // Don't necessarily throw a fatal error for player issues, maybe just log
+                    if (errorData.error?.reason === 'PREMIUM_REQUIRED') {
+                         updatePlayerStatus('Spotify Premium required for playback.', true);
+                    } else {
+                        updatePlayerStatus(`Playback Error: ${errorData.error?.message || response.statusText}`, true);
+                    }
+                    return null; // Indicate failure but don't halt everything
+                }
                 if (!response.ok) { const errorData = await response.json().catch(() => ({})); console.error(`Spotify API Error (${response.status}): ${response.statusText}`, errorData); throw new Error(`Spotify API Error: ${response.status} ${response.statusText}`); }
-                if (response.status === 204 || response.headers.get('content-length') === '0') { return null; }
+                if (response.status === 204 || response.headers.get('content-length') === '0') { return true; } // Return true for success on 204 (like player commands)
                 return await response.json();
             } catch (error) {
                  console.error(`Error making Spotify API call to ${endpoint}:`, error);
                  if (retries > 0 && !error.message.includes('401')) {
                     console.log(`Retrying API call (${retries} retries left)...`); await new Promise(resolve => setTimeout(resolve, 1000)); return spotifyApiCall(endpoint, method, body, retries - 1);
-                 } else { showError(`Failed API call to ${endpoint}. Check console.`); setLoading(false); throw error; }
+                 } else if (!error.message.includes('401')) { // Don't show generic error for expected 401
+                    showError(`Failed API call to ${endpoint}. Check console.`);
+                    setLoading(false);
+                 }
+                 throw error; // Re-throw non-retryable errors (or handled 401s)
             }
         }
 
-        // --- Authentication Flow ---
-        function redirectToSpotifyLogin() {
+        // --- Authentication Flow (Same basic flow, but new scopes requested) ---
+        function redirectToSpotifyLogin() { /* ... same ... */
              codeVerifier = generateRandomString(128); sessionStorage.setItem('spotify_code_verifier', codeVerifier);
              generateCodeChallenge(codeVerifier).then(codeChallenge => {
                  const params = new URLSearchParams({ client_id: CLIENT_ID, response_type: 'code', redirect_uri: REDIRECT_URI, scope: SCOPES, code_challenge_method: 'S256', code_challenge: codeChallenge });
                  window.location.href = `${SPOTIFY_AUTHORIZE_ENDPOINT}?${params.toString()}`;
              });
         }
-        async function fetchAccessToken(code, verifier) {
+        async function fetchAccessToken(code, verifier) { /* ... same ... */
             setLoading(true, "Authenticating...");
             try {
                  const params = new URLSearchParams({ client_id: CLIENT_ID, grant_type: 'authorization_code', code: code, redirect_uri: REDIRECT_URI, code_verifier: verifier });
                  const response = await fetch(SPOTIFY_TOKEN_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() });
-                 if (!response.ok) { const errorData = await response.json().catch(() => ({})); console.error("Error fetching access token:", response.status, errorData); throw new Error(`Token exchange failed: ${response.statusText}`); }
+                 if (!response.ok) { throw new Error(`Token exchange failed: ${response.statusText}`); }
                  const data = await response.json(); accessToken = data.access_token; sessionStorage.setItem('spotify_access_token', accessToken);
+                 // *** Initialize SDK AFTER getting token ***
+                 initializeSpotifySDK();
                  initializeMainApp();
-            } catch (error) { console.error("Could not obtain access token:", error); showError("Failed to authenticate with Spotify. Please try logging in again."); clearAuthData(); showLogin(); }
+            } catch (error) { console.error("Could not obtain access token:", error); showError("Failed to authenticate. Please try again."); clearAuthData(); showLogin(); }
             finally { setLoading(false); window.history.replaceState({}, document.title, REDIRECT_URI); sessionStorage.removeItem('spotify_code_verifier'); }
          }
-        function handleRedirect() {
+        function handleRedirect() { /* ... same logic, calls fetchAccessToken or initializeMainApp ... */
             const urlParams = new URLSearchParams(window.location.search); const code = urlParams.get('code'); const error = urlParams.get('error'); const storedVerifier = sessionStorage.getItem('spotify_code_verifier');
-            if (error) { console.error("Spotify Authorization Error:", error); showError(`Login failed: ${error}. Please try again.`); showLogin(); window.history.replaceState({}, document.title, REDIRECT_URI); }
+            if (error) { console.error("Spotify Auth Error:", error); showError(`Login failed: ${error}.`); showLogin(); window.history.replaceState({}, document.title, REDIRECT_URI); }
             else if (code && storedVerifier) { fetchAccessToken(code, storedVerifier); }
-            else if (sessionStorage.getItem('spotify_access_token')) { accessToken = sessionStorage.getItem('spotify_access_token'); console.log("Found existing access token."); initializeMainApp(); }
-            else { showLogin(); }
+            else if (sessionStorage.getItem('spotify_access_token')) {
+                 accessToken = sessionStorage.getItem('spotify_access_token');
+                 console.log("Found existing access token.");
+                 // *** Initialize SDK if token exists on load ***
+                 initializeSpotifySDK();
+                 initializeMainApp();
+            } else { showLogin(); }
         }
-        function clearAuthData() { accessToken = null; codeVerifier = null; sessionStorage.removeItem('spotify_access_token'); sessionStorage.removeItem('spotify_code_verifier'); }
-        function logout() { clearAuthData(); resetAppState(); showLogin(); window.location.reload(); }
+        function clearAuthData() { /* ... same ... */
+             accessToken = null; codeVerifier = null; deviceId = null; isSdkReady = false;
+             if (spotifyPlayer) { spotifyPlayer.disconnect(); spotifyPlayer = null; } // Disconnect SDK player
+             sessionStorage.removeItem('spotify_access_token'); sessionStorage.removeItem('spotify_code_verifier');
+         }
+        function logout() { /* ... calls clearAuthData, same ... */
+             clearAuthData(); resetAppState(); showLogin(); window.location.reload();
+         }
+
+
+        // --- Spotify SDK Initialization ---
+        function initializeSpotifySDK() {
+            if (spotifyPlayer) {
+                console.log("SDK Player already initialized.");
+                return;
+            }
+            if (!accessToken) {
+                 console.error("Cannot initialize SDK without an access token.");
+                 return;
+            }
+
+            console.log("Initializing Spotify Web Playback SDK...");
+            updatePlayerStatus("Connecting player...");
+
+            // This function is called when the SDK script has loaded
+            window.onSpotifyWebPlaybackSDKReady = () => {
+                 spotifyPlayer = new Spotify.Player({
+                    name: 'Spotify Sorter App', // How it shows up in Spotify Connect
+                    getOAuthToken: cb => {
+                        // Returns the *current* access token
+                        // Note: For production, you'd need robust token refresh logic here if the token could expire during SDK use
+                        console.log("SDK requested token.");
+                         cb(accessToken);
+                     },
+                    volume: 0.5 // Initial volume (0.0 to 1.0)
+                });
+
+                // SDK Event Listeners
+                spotifyPlayer.addListener('ready', ({ device_id }) => {
+                    console.log('SDK Player Ready with Device ID', device_id);
+                    deviceId = device_id;
+                    isSdkReady = true;
+                    updatePlayerStatus("Player ready.", false);
+                    // If a track was already displayed before SDK was ready, play it now
+                    if (currentTrackUri) {
+                        playTrackWithSDK(currentTrackUri);
+                    }
+                });
+
+                spotifyPlayer.addListener('not_ready', ({ device_id }) => {
+                    console.log('Device ID has gone offline', device_id);
+                    isSdkReady = false;
+                    deviceId = null;
+                    updatePlayerStatus("Player disconnected.", true);
+                });
+
+                spotifyPlayer.addListener('initialization_error', ({ message }) => {
+                    console.error('Failed to initialize SDK player:', message);
+                    updatePlayerStatus(`Player Init Error: ${message}`, true);
+                     isSdkReady = false;
+                });
+
+                spotifyPlayer.addListener('authentication_error', ({ message }) => {
+                    console.error('Failed to authenticate SDK player:', message);
+                    updatePlayerStatus(`Player Auth Error: ${message}`, true);
+                     isSdkReady = false;
+                     // Potentially trigger re-login here if it's a token issue
+                     // clearAuthData(); redirectToSpotifyLogin();
+                });
+
+                spotifyPlayer.addListener('account_error', ({ message }) => {
+                    console.error('Account error for SDK player:', message);
+                    // *** THIS IS LIKELY THE NON-PREMIUM ERROR ***
+                    updatePlayerStatus(`Account Error: ${message}. Playback requires Spotify Premium.`, true);
+                     isSdkReady = false;
+                });
+
+                 spotifyPlayer.addListener('playback_error', ({ message }) => {
+                     console.error('Playback error:', message);
+                     updatePlayerStatus(`Playback Error: ${message}`, true);
+                 });
+
+                  // Optional: Listen for state changes (e.g., track ended)
+                 spotifyPlayer.addListener('player_state_changed', (state) => {
+                    if (!state) return; // Can be null if player disconnects
+
+                    // Example: Detect if track ended naturally
+                    // if (state.paused && state.position === 0 && state.restrictions.disallow_seeking_prev) {
+                    //    console.log('Track likely ended.');
+                    //    // Decide if you want to auto-advance or just stop
+                    // }
+                 });
+
+
+                // Connect the player!
+                spotifyPlayer.connect().then(success => {
+                    if (success) {
+                        console.log('The Web Playback SDK successfully connected to Spotify!');
+                    } else {
+                        console.error('The Web Playback SDK failed to connect to Spotify.');
+                        updatePlayerStatus("Failed to connect player.", true);
+                    }
+                });
+            };
+             // If SDK script isn't loaded yet, the above assignment will handle it.
+             // If it *is* already loaded (e.g., page refresh after login), trigger manually.
+             if (typeof Spotify !== 'undefined' && window.onSpotifyWebPlaybackSDKReady) {
+                 console.log("SDK already loaded, calling onSpotifyWebPlaybackSDKReady manually.");
+                 window.onSpotifyWebPlaybackSDKReady();
+             }
+        }
+
 
         // --- App Initialization and UI Updates ---
-        function showLogin() { loginSection.style.display = 'flex'; mainApp.style.display = 'none'; }
+        function showLogin() { loginSection.style.display = 'flex'; mainApp.style.display = 'none'; updatePlayerStatus(''); }
         function showMainApp() { loginSection.style.display = 'none'; mainApp.style.display = 'flex'; }
-        function setLoading(isLoading, message = "Loading...") {
+        function updatePlayerStatus(message, isWarning = false) {
+             playerStatusEl.textContent = message;
+             playerStatusEl.classList.toggle('warning', isWarning);
+        }
+        function setLoading(isLoading, message = "Loading...") { /* ... same logic ... */
              loadingOverlay.style.display = isLoading ? 'flex' : 'none';
              if(isLoading) loadingOverlay.textContent = message;
-             const shouldDisable = isLoading || (mainApp.style.display === 'flex' && (currentTrackIndex < 0 || currentTrackIndex >= tracks.length) && tracks.length > 0); // Disable main controls also when finished
+             const shouldDisable = isLoading || !isSdkReady || (mainApp.style.display === 'flex' && (currentTrackIndex < 0 || currentTrackIndex >= tracks.length) && tracks.length > 0);
              playlistSelector.disabled = isLoading;
              ignoreButton.disabled = shouldDisable;
              keepButton.disabled = shouldDisable;
              deleteButton.disabled = shouldDisable;
              makePlaylistButton.disabled = isLoading || keptTracks.length === 0;
-             document.querySelectorAll('.kept-list-btn').forEach(btn => btn.disabled = isLoading); // Disable kept list buttons too
+             document.querySelectorAll('.kept-list-btn').forEach(btn => btn.disabled = isLoading || !isSdkReady); // Disable list buttons if SDK not ready
          }
         function showError(message) { alert(`Error: ${message}`); console.error("App Error:", message); }
         async function initializeMainApp() {
-            setLoading(true, "Fetching user data..."); showMainApp();
-             try {
-                 const userData = await spotifyApiCall('/me'); if (!userData) return; userId = userData.id; console.log("User ID:", userId); await loadPlaylists();
-             } catch (error) { showError("Failed to load user data. Please try logging in again."); logout(); }
-             finally { setLoading(false); }
+            // Don't fetch user data if already fetched during SDK init path
+             if (!userId) {
+                 setLoading(true, "Fetching user data...");
+                 try {
+                     const userData = await spotifyApiCall('/me');
+                     if (!userData) return; // API call failure handled inside
+                     userId = userData.id;
+                     console.log("User ID:", userId);
+                 } catch (error) {
+                     showError("Failed to load user data. Please try logging in again.");
+                     logout();
+                     return; // Stop initialization
+                 } finally {
+                    setLoading(false);
+                 }
+             }
+             showMainApp();
+             await loadPlaylists(); // Load playlists after user ID is confirmed
         }
-        async function loadPlaylists() {
-            setLoading(true, "Fetching playlists..."); playlistSelector.disabled = true; playlistSelector.innerHTML = '<option value="">Loading playlists...</option>';
+        async function loadPlaylists() { /* ... same logic ... */
+             setLoading(true, "Fetching playlists..."); playlistSelector.disabled = true; playlistSelector.innerHTML = '<option value="">Loading...</option>';
              playlists = []; let url = '/me/playlists?limit=50'; let hasMore = true;
              try {
                  while (url && hasMore) {
@@ -424,197 +448,235 @@
                     }
                 });
                  playlistSelector.disabled = false;
-             } catch (error) { showError("Failed to load playlists."); playlistSelector.innerHTML = '<option value="">Error loading</option>'; }
+             } catch (error) { showError("Failed to load playlists."); playlistSelector.innerHTML = '<option value="">Error</option>'; }
              finally { setLoading(false); }
         }
-        async function handlePlaylistSelect() {
+        async function handlePlaylistSelect() { /* ... same logic, but calls displayTrack ... */
             selectedPlaylistId = playlistSelector.value; if (!selectedPlaylistId) { resetSortingArea(); return; }
             const selectedPlaylist = playlists.find(p => p.id === selectedPlaylistId); currentPlaylistName = selectedPlaylist ? selectedPlaylist.name : "Unknown";
             currentPlaylistNameEl.textContent = currentPlaylistName; setLoading(true, `Loading tracks...`); resetSortingArea(); tracks = [];
-            let url = `/playlists/${selectedPlaylistId}/tracks?fields=items(track(id,name,artists(name),album(images),preview_url,uri)),next,total&limit=100`;
+            // *** Make sure fields includes uri *** (it already did, but good to check)
+            let url = `/playlists/${selectedPlaylistId}/tracks?fields=items(track(id,name,artists(name),album(images),uri)),next,total&limit=100`; // Removed preview_url field
             let hasMore = true; let totalExpected = 0;
             try {
                  while (url && hasMore) {
                      const data = await spotifyApiCall(url); if (!data) { hasMore = false; break; }
                      if (totalExpected === 0) totalExpected = data.total;
-                     const validItems = data.items.filter(item => item.track); tracks = tracks.concat(validItems);
+                     const validItems = data.items.filter(item => item.track && item.track.uri); // Ensure track and URI exist
+                     tracks = tracks.concat(validItems);
                      url = data.next ? data.next.replace(SPOTIFY_API_BASE_URL, '') : null; if (!url) hasMore = false;
                      setLoading(true, `Loading tracks... (${tracks.length}/${totalExpected || '?'})`);
                  }
                 console.log(`Loaded ${tracks.length} tracks.`);
                 if (tracks.length > 0) { currentTrackIndex = 0; displayTrack(currentTrackIndex); enableControls(); }
-                else { showError("Playlist empty or contains unreadable tracks."); resetSortingArea(); }
+                else { showError("Playlist empty or no tracks with valid URIs found."); resetSortingArea(); }
              } catch (error) { showError(`Failed to load tracks for ${currentPlaylistName}.`); resetSortingArea(); }
              finally { setLoading(false); }
-        }
+         }
         function resetSortingArea() {
-             currentTrackIndex = -1; tracks = []; keptTracks = []; updateKeepListUI(); updateProgress();
+             currentTrackIndex = -1; tracks = []; keptTracks = []; currentTrackUri = null;
+             // Pause SDK player if it was playing something from the previous playlist
+             if (isSdkReady && deviceId) {
+                 spotifyApiCall(`/me/player/pause?device_id=${deviceId}`, 'PUT');
+             }
+             updateKeepListUI(); updateProgress();
              trackCoverEl.src = ""; trackTitleEl.textContent = "Track Title"; trackArtistEl.textContent = "Artist Name";
-             noPreviewMessageEl.classList.add('hidden'); audioPlayer.pause(); audioPlayer.src = "";
              disableControls(); makePlaylistButton.disabled = true;
              currentPlaylistNameEl.textContent = selectedPlaylistId ? currentPlaylistName : "None";
              currentSongIndexEl.textContent = "0"; totalSongsEl.textContent = "0"; progressPercentageEl.textContent = "0%";
          }
 
         function displayTrack(index) {
-             setLoading(true, "Loading next track...");
-             if (index < 0 || index >= tracks.length) {
-                // ... (rest of end of playlist logic)
-                setLoading(false);
-                return;
-            }
+            if (index < 0 || index >= tracks.length) { console.log("End of playlist."); handleEndOfPlaylist(); return; }
 
             const item = tracks[index];
-            if (!item || !item.track) {
-                // ... (rest of skipping logic)
-                 moveToNextTrack();
-                 return;
-             }
+            if (!item?.track?.uri) { console.warn("Skipping invalid track data at index:", index); moveToNextTrack(); return; }
             const track = item.track;
+            if (!track.name || !track.artists || !track.album) { console.warn("Skipping track with missing details:", track); moveToNextTrack(); return; }
 
-            // *** ADD THIS LOGGING LINE ***
-            console.log(`Displaying Track #${index}:`, JSON.stringify(track, null, 2)); // Log the whole track object nicely formatted
+            setLoading(true, "Loading track..."); // Show loading overlay
 
-             if (!track.name || !track.artists || !track.album) {
-                // ... (rest of skipping logic)
-                 moveToNextTrack();
+            currentTrackUri = track.uri; // Store the URI of the track being displayed
+
+            trackTitleEl.textContent = track.name;
+            trackArtistEl.textContent = track.artists.map(artist => artist.name).join(', ');
+            let imageUrl = '';
+            if (track.album.images && track.album.images.length > 0) { const mediumImage = track.album.images.find(img => img.width >= 250 && img.width <= 400); imageUrl = mediumImage ? mediumImage.url : track.album.images[0].url; }
+            trackCoverEl.src = imageUrl; trackCoverEl.alt = `Cover art for ${track.name}`;
+            updateProgress();
+
+            // *** Play using SDK ***
+            playTrackWithSDK(currentTrackUri);
+
+            enableControls();
+            setLoading(false); // Hide loading overlay
+        }
+
+        // --- SDK Playback Function ---
+        async function playTrackWithSDK(trackUri) {
+            if (!isSdkReady || !deviceId) {
+                console.warn("SDK not ready or no device ID, cannot play track:", trackUri);
+                 updatePlayerStatus("Player not ready. Cannot play.", true);
+                // Store the track URI to play when SDK becomes ready
+                currentTrackUri = trackUri;
+                return;
+            }
+             if (!trackUri) {
+                 console.warn("No track URI provided to play.");
                  return;
              }
 
-            // ... (rest of setting title, artist, cover) ...
-             trackTitleEl.textContent = track.name;
-             trackArtistEl.textContent = track.artists.map(artist => artist.name).join(', ');
-             // ... set cover image ...
+            console.log(`Requesting playback of URI: ${trackUri} on device: ${deviceId}`);
+            updatePlayerStatus(`Playing ${trackTitleEl.textContent}...`); // Optimistic UI update
 
-             updateProgress();
-
-             // Handle audio preview
-             audioPlayer.pause();
-             if (track.preview_url) { // Check remains the same
-                 console.log(`   Found preview_url: ${track.preview_url}`); // Log if found
-                 audioPlayer.src = track.preview_url;
-                 noPreviewMessageEl.classList.add('hidden');
-                 audioPlayer.play()
-                    .then(() => { console.log("   Preview auto-play started."); })
-                    .catch(error => { console.warn(`   Audio auto-play failed for "${track.name}":`, error.message); });
-             } else {
-                 console.log("   No preview_url found for this track."); // Log if not found
-                 audioPlayer.src = "";
-                 noPreviewMessageEl.classList.remove('hidden');
-                 noPreviewMessageEl.textContent = "No preview available for this track.";
-             }
-
-             enableControls();
-             setLoading(false);
+            try {
+                // Use the /me/player/play endpoint
+                 const success = await spotifyApiCall(`/me/player/play?device_id=${deviceId}`, 'PUT', {
+                     uris: [trackUri] // Play a single track by its URI
+                 });
+                 if (success) {
+                     console.log("Playback request successful for:", trackUri);
+                     // Status might already be updated, or you can refine it here
+                 } else {
+                      // Error handled/logged within spotifyApiCall based on response code
+                      console.warn("Playback request failed or resulted in non-OK status.");
+                     // Status already updated by error handler in spotifyApiCall
+                 }
+            } catch (error) {
+                // Catch errors not handled by the API call helper (e.g., network)
+                console.error("Error requesting playback:", error);
+                showError(`Failed to play track: ${error.message}`);
+                updatePlayerStatus("Playback failed.", true);
+            }
         }
 
-        function updateProgress() {
-            const total = tracks.length; const current = currentTrackIndex + 1; totalSongsEl.textContent = total;
-            currentSongIndexEl.textContent = total === 0 ? 0 : Math.min(current, total);
-            const percentage = total === 0 ? 0 : Math.round((Math.min(current, total) / total) * 100); progressPercentageEl.textContent = `${percentage}%`;
+
+        function updateProgress() { /* ... same ... */
+             const total = tracks.length; const current = currentTrackIndex + 1; totalSongsEl.textContent = total;
+             currentSongIndexEl.textContent = total === 0 ? 0 : Math.min(current, total);
+             const percentage = total === 0 ? 0 : Math.round((Math.min(current, total) / total) * 100); progressPercentageEl.textContent = `${percentage}%`;
         }
-        function enableControls() { ignoreButton.disabled = false; keepButton.disabled = false; deleteButton.disabled = false; }
+        function enableControls() { ignoreButton.disabled = !isSdkReady; keepButton.disabled = !isSdkReady; deleteButton.disabled = !isSdkReady; } // Enable based on SDK readiness
         function disableControls() { ignoreButton.disabled = true; keepButton.disabled = true; deleteButton.disabled = true; }
 
-        // --- Sorting Actions ---
-        function handleIgnore() { console.log("Ignored:", tracks[currentTrackIndex]?.track?.name || 'Track'); moveToNextTrack(); }
-        function handleKeep() {
-              const currentItem = tracks[currentTrackIndex];
-             if (currentItem?.track?.uri) { keptTracks.push({ track: currentItem.track, uri: currentItem.track.uri }); console.log("Kept:", currentItem.track.name); updateKeepListUI(); moveToNextTrack(); }
-             else { console.error("Cannot keep track: invalid data at index", currentTrackIndex); showError("Could not add track (invalid data)."); moveToNextTrack(); }
-         }
+        // --- Sorting Actions (Pause playback before moving) ---
+        async function handleIgnore() {
+            console.log("Ignored:", tracks[currentTrackIndex]?.track?.name || 'Track');
+            // await pausePlayback(); // Optional: explicitly pause before next
+            moveToNextTrack();
+        }
+        async function handleKeep() {
+            const currentItem = tracks[currentTrackIndex];
+            if (currentItem?.track?.uri) {
+                keptTracks.push({ track: currentItem.track, uri: currentItem.track.uri });
+                console.log("Kept:", currentItem.track.name);
+                updateKeepListUI();
+                // await pausePlayback(); // Optional: explicitly pause before next
+                moveToNextTrack();
+            } else { console.error("Cannot keep track: invalid data"); showError("Could not add track."); moveToNextTrack(); }
+        }
         async function handleDelete() {
             if (currentTrackIndex < 0 || currentTrackIndex >= tracks.length) return;
             const trackToDeleteItem = tracks[currentTrackIndex];
-             if (!trackToDeleteItem?.track?.uri) { showError("Cannot delete track: invalid data."); moveToNextTrack(); return; }
-             const trackToDelete = trackToDeleteItem.track;
+            if (!trackToDeleteItem?.track?.uri) { showError("Cannot delete: invalid data."); moveToNextTrack(); return; }
+            const trackToDelete = trackToDeleteItem.track;
+            // await pausePlayback(); // Pause before confirmation
             const confirmed = confirm(`DELETE "${trackToDelete.name}" from "${currentPlaylistName}"?\n\nThis cannot be undone.`);
             if (confirmed) {
-                 setLoading(true, `Deleting "${trackToDelete.name}"...`);
+                setLoading(true, `Deleting "${trackToDelete.name}"...`);
                 try {
                     await spotifyApiCall(`/playlists/${selectedPlaylistId}/tracks`, 'DELETE', { tracks: [{ uri: trackToDelete.uri }] });
                     console.log("Deleted from Spotify."); tracks.splice(currentTrackIndex, 1); totalSongsEl.textContent = tracks.length;
-                     if (currentTrackIndex >= tracks.length) { handleEndOfPlaylist(); } else { displayTrack(currentTrackIndex); } // Display new track at current index
-                } catch (error) { showError(`Failed to delete "${trackToDelete.name}".`); moveToNextTrack(); } // Move on even if delete failed API side
+                    if (currentTrackIndex >= tracks.length) { handleEndOfPlaylist(); } else { displayTrack(currentTrackIndex); }
+                } catch (error) { showError(`Failed to delete "${trackToDelete.name}".`); moveToNextTrack(); } // Still move on
                 finally { setLoading(false); }
-            } else { console.log("Deletion cancelled."); }
+            } else { console.log("Deletion cancelled."); /* Maybe resume playback if paused? */ }
         }
-        function moveToNextTrack() { currentTrackIndex++; displayTrack(currentTrackIndex); } // displayTrack handles end of list
+
+        // Optional function to explicitly pause
+        // async function pausePlayback() {
+        //     if (isSdkReady && deviceId) {
+        //         console.log("Pausing playback...");
+        //         await spotifyApiCall(`/me/player/pause?device_id=${deviceId}`, 'PUT');
+        //     }
+        // }
+
+
+        function moveToNextTrack() { currentTrackIndex++; displayTrack(currentTrackIndex); } // displayTrack handles end of list and playing next
         function handleEndOfPlaylist() {
             console.log("Finished sorting playlist!");
-            trackTitleEl.textContent = "Playlist Sorted!"; trackArtistEl.textContent = `Check the 'Kept Songs' list.`;
-            trackCoverEl.src = ""; audioPlayer.pause(); audioPlayer.src = ""; noPreviewMessageEl.classList.add('hidden');
-            disableControls(); updateProgress(); // Ensure progress shows 100% or final state
+            // Pause the player
+            if (isSdkReady && deviceId) {
+                 spotifyApiCall(`/me/player/pause?device_id=${deviceId}`, 'PUT');
+             }
+            trackTitleEl.textContent = "Playlist Sorted!"; trackArtistEl.textContent = `Check 'Kept Songs'.`;
+            trackCoverEl.src = ""; currentTrackUri = null;
+            disableControls(); updateProgress();
         }
 
         // --- Keep List and Playlist Creation ---
         function updateKeepListUI() {
-            keptSongsListEl.innerHTML = '';
-            const isLoadingState = isLoading();
-
+            keptSongsListEl.innerHTML = ''; const isLoadingState = isLoading(); const sdkNotReady = !isSdkReady;
             keptTracks.forEach((item, index) => {
-                // *** ADD THIS LOGGING LINE ***
-                console.log(`Updating Kept List UI for index ${index}: Has preview_url?`, !!item.track.preview_url, item.track.name);
-
-                const li = document.createElement('li');
-                li.dataset.trackIndex = index;
-                // ... (rest of creating the li content, buttons etc.) ...
-
-                 // Make sure the play button disable logic still uses the check
-                 const playBtn = document.createElement('button');
-                 // ... (set classes etc.) ...
-                 playBtn.disabled = isLoadingState || !item.track.preview_url; // Correct check
-                 if (!item.track.preview_url) {
-                     playBtn.title = 'No Preview Available';
-                 } else {
-                      playBtn.title = 'Play Preview';
-                 }
-                 // ... (append buttons etc.) ...
-                 keptSongsListEl.appendChild(li);
-             });
+                const li = document.createElement('li'); li.dataset.trackIndex = index;
+                const container = document.createElement('div'); container.className = 'kept-song-item-container';
+                const textDiv = document.createElement('div'); textDiv.className = 'kept-song-text';
+                textDiv.textContent = `${item.track.name}`; const artistSpan = document.createElement('span');
+                artistSpan.textContent = item.track.artists.map(a => a.name).join(', '); textDiv.appendChild(artistSpan);
+                const buttonsDiv = document.createElement('div'); buttonsDiv.className = 'kept-song-buttons';
+                // *** Play button now triggers SDK playback ***
+                const playBtn = document.createElement('button'); playBtn.className = 'kept-list-btn kept-play-btn'; playBtn.textContent = '▶️';
+                playBtn.disabled = isLoadingState || sdkNotReady; // Disable if loading OR SDK not ready
+                playBtn.title = sdkNotReady ? 'Player not ready' : 'Play Track';
+                const removeBtn = document.createElement('button'); removeBtn.className = 'kept-list-btn kept-remove-btn'; removeBtn.title = 'Remove from list'; removeBtn.textContent = '🗑️'; removeBtn.disabled = isLoadingState;
+                buttonsDiv.appendChild(playBtn); buttonsDiv.appendChild(removeBtn); container.appendChild(textDiv); container.appendChild(buttonsDiv); li.appendChild(container); keptSongsListEl.appendChild(li);
+            });
              makePlaylistButton.disabled = keptTracks.length === 0 || isLoadingState;
-         }
+        }
         function handleKeptListInteraction(event) {
             const playButton = event.target.closest('.kept-play-btn'); const removeButton = event.target.closest('.kept-remove-btn');
-            if (!playButton && !removeButton || isLoading()) return;
+            if (!playButton && !removeButton || isLoading() || !isSdkReady) { // Also check SDK readiness
+                if(!isSdkReady && (playButton || removeButton)) updatePlayerStatus("Player not ready.", true);
+                return;
+            }
             const listItem = event.target.closest('li'); if (!listItem?.dataset?.trackIndex) return;
             const trackIndex = parseInt(listItem.dataset.trackIndex, 10);
-            if (isNaN(trackIndex) || trackIndex < 0 || trackIndex >= keptTracks.length) { console.error("Invalid kept track index:", trackIndex); return; }
+            if (isNaN(trackIndex) || trackIndex < 0 || trackIndex >= keptTracks.length) return;
              const trackItem = keptTracks[trackIndex];
             if (playButton) {
-                 if (trackItem.track.preview_url) { audioPlayer.pause(); audioPlayer.src = trackItem.track.preview_url; audioPlayer.play().catch(e => { console.warn("Could not play kept track preview:", e.message); alert(`Could not play preview for "${trackItem.track.name}".`); }); }
-                 else { alert(`No preview available for "${trackItem.track.name}".`); }
-            } else if (removeButton) { keptTracks.splice(trackIndex, 1); updateKeepListUI(); }
+                // Play the kept track using the SDK
+                console.log("Play kept track requested:", trackItem.track.name);
+                playTrackWithSDK(trackItem.uri); // Use the main play function
+            } else if (removeButton) {
+                // Remove from list (same as before)
+                 keptTracks.splice(trackIndex, 1); updateKeepListUI();
+             }
         }
-        async function handleMakePlaylist() {
+        async function handleMakePlaylist() { /* ... same logic ... */
             if (keptTracks.length === 0 || !userId) { showError("No songs kept or user ID missing."); return; }
             const defaultName = `Sorted - ${currentPlaylistName}`; const newPlaylistName = prompt("Enter name for new playlist:", defaultName);
             if (!newPlaylistName?.trim()) { alert("Playlist creation cancelled."); return; }
              setLoading(true, "Creating new playlist...");
             try {
                 const newPlaylist = await spotifyApiCall(`/users/${userId}/playlists`, 'POST', { name: newPlaylistName.trim(), public: false, description: `Songs kept from sorting '${currentPlaylistName}'.` });
-                 if (!newPlaylist?.id) { throw new Error("Failed to create playlist (API response invalid)."); }
+                 if (!newPlaylist?.id) { throw new Error("Failed to create playlist."); }
                  setLoading(true, `Adding ${keptTracks.length} songs...`);
-                const trackUris = keptTracks.map(item => item.uri).filter(uri => uri); // Ensure no null/undefined uris
-                 if (trackUris.length !== keptTracks.length) console.warn("Some kept tracks had missing URIs!");
+                const trackUris = keptTracks.map(item => item.uri).filter(uri => uri);
                  if (trackUris.length > 0) {
                      const batchSize = 100; let tracksAddedCount = 0;
                      for (let i = 0; i < trackUris.length; i += batchSize) {
-                         const batch = trackUris.slice(i, i + batchSize); setLoading(true, `Adding songs... (${tracksAddedCount}/${trackUris.length})`);
-                         await spotifyApiCall(`/playlists/${newPlaylist.id}/tracks`, 'POST', { uris: batch }); tracksAddedCount += batch.length; await new Promise(resolve => setTimeout(resolve, 200)); // Prevent rate limiting
+                         const batch = trackUris.slice(i, i + batchSize); setLoading(true, `Adding... (${tracksAddedCount}/${trackUris.length})`);
+                         await spotifyApiCall(`/playlists/${newPlaylist.id}/tracks`, 'POST', { uris: batch }); tracksAddedCount += batch.length; await new Promise(resolve => setTimeout(resolve, 200));
                      }
-                     alert(`Successfully created playlist "${newPlaylistName}" with ${tracksAddedCount} songs!`);
-                 } else {
-                     alert(`Playlist "${newPlaylistName}" created, but no valid tracks were available to add.`);
-                 }
-                 // Optional: Clear list after creation
-                 // keptTracks = []; updateKeepListUI();
-            } catch (error) { showError(`Failed to create playlist or add tracks: ${error.message}.`); }
+                     alert(`Created playlist "${newPlaylistName}" with ${tracksAddedCount} songs!`);
+                 } else { alert(`Playlist "${newPlaylistName}" created, but no tracks to add.`); }
+            } catch (error) { showError(`Failed to create playlist/add tracks: ${error.message}.`); }
             finally { setLoading(false); }
-        }
-        function resetAppState() {
+         }
+        function resetAppState() { /* ... same, calls clearAuthData which handles SDK disconnect ... */
             accessToken = null; codeVerifier = null; userId = null; playlists = []; selectedPlaylistId = null; currentPlaylistName = "";
-            resetSortingArea(); playlistSelector.innerHTML = '<option value="">Log in to load</option>'; playlistSelector.disabled = true;
+            resetSortingArea(); playlistSelector.innerHTML = '<option value="">Log in</option>'; playlistSelector.disabled = true;
+            updatePlayerStatus(''); // Clear status on reset
         }
          function isLoading() { return loadingOverlay.style.display === 'flex'; }
 
@@ -627,25 +689,18 @@
         makePlaylistButton.addEventListener('click', handleMakePlaylist);
         keptSongsListEl.addEventListener('click', handleKeptListInteraction);
 
-        document.addEventListener('keydown', (event) => {
-            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || isLoading() || mainApp.style.display !== 'flex') return;
-            switch (event.key) {
-                case 'ArrowLeft': if (!ignoreButton.disabled) { event.preventDefault(); handleIgnore(); } break;
-                case 'ArrowRight': if (!keepButton.disabled) { event.preventDefault(); handleKeep(); } break;
-                case 'Backspace': if (!deleteButton.disabled) { event.preventDefault(); handleDelete(); } break;
-            }
-         });
-        audioPlayer.addEventListener('error', (e) => {
-             // Only log significant errors, not the expected 'empty src' when no preview exists
-             if (audioPlayer.error && audioPlayer.error.code !== MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED && audioPlayer.currentSrc) {
-                  console.error("Audio Player Error:", audioPlayer.error.code, audioPlayer.error.message, "Src:", audioPlayer.currentSrc);
-             } else if (!audioPlayer.currentSrc && !noPreviewMessageEl.classList.contains('hidden')) {
-                 // This is the expected state when no preview URL was provided. Quietly ignore.
+        document.addEventListener('keydown', (event) => { /* ... same key bindings ... */
+             if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || isLoading() || mainApp.style.display !== 'flex' || !isSdkReady) return; // Also check SDK ready
+             switch (event.key) {
+                 case 'ArrowLeft': if (!ignoreButton.disabled) { event.preventDefault(); handleIgnore(); } break;
+                 case 'ArrowRight': if (!keepButton.disabled) { event.preventDefault(); handleKeep(); } break;
+                 case 'Backspace': if (!deleteButton.disabled) { event.preventDefault(); handleDelete(); } break;
              }
          });
-         audioPlayer.addEventListener('canplay', () => { /* Ready to play (if src is valid) */ });
+        // Removed audioPlayer event listeners
 
         // --- Initial Load ---
+        // SDK initialization is now tied to getting the access token via handleRedirect or fetchAccessToken
         handleRedirect();
 
     </script>
