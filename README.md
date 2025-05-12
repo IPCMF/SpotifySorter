@@ -93,6 +93,4 @@ If you want to run this project locally:
 
 Pull requests are welcome! If you have suggestions or improvements, feel free to fork the repo and submit a PR.
 
-## License
-
-[MIT](LICENSE) <!-- Optional: Add a LICENSE file (e.g., MIT License) -->
+## Entire credits go to Google Gemini 2.5 Pro for working with me to generate this site!
